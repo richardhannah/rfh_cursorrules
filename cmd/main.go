@@ -7,6 +7,8 @@ import (
 	"github.com/sashabaranov/go-openai"
 	"log"
 	"net/http"
+	"totmapi/internal/auth"
+	"totmapi/internal/health"
 )
 
 type PromptRequest struct {
@@ -21,6 +23,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/openai/prompt", Handler)
+	mux.HandleFunc("/hello", health.Hello)
+	mux.HandleFunc("/database", health.DatabaseHealth)
+	mux.HandleFunc("/login", auth.Login)
 
 	// Wrap the multiplexer with the CORS middleware
 	handlerWithCORS := corsMiddleware(mux)

@@ -1,0 +1,28 @@
+databaseType = "PostgreSql"
+id = "37a60e5f-08a4-4deb-9bc4-8fec9491c958"
+name = "totmapi"
+
+[flyway]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+schemaModelLocation = "schema-model"
+validateMigrationNaming = true
+
+  [flyway.check]
+  majorTolerance = 0
+
+[flywayDesktop]
+developmentEnvironment = "development"
+shadowEnvironment = "shadow"
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.postgresql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[environments.totm-local]
+url = "jdbc:postgresql://localhost:5432/"
+schemas = [ "richard" ]
+displayName = "totm-local"
