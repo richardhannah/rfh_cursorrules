@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -36,9 +38,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
-	log.Printf(reqData.Password)
-	log.Printf(user.Password)
-	if user.Password == reqData.Password {
+
+	inputPass := hashit(reqData.Password + user.Salt)
+
+	if user.Password == inputPass {
 		// Write a response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -48,4 +51,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 	}
 
+}
+
+func hashit(saltedPass string) string {
+	// Compute the SHA-256 hash
+	hash := sha256.New()
+	hash.Write([]byte(saltedPass))
+	hashedBytes := hash.Sum(nil)
+
+	// Encode the hashed bytes to a hex string
+	hashHex := hex.EncodeToString(hashedBytes)
+	return hashHex
 }

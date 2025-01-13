@@ -10,6 +10,7 @@ import (
 type User struct {
 	Username string
 	Password string
+	Salt     string
 }
 
 func SelectUser(username string) (User, error) {
@@ -21,16 +22,17 @@ func SelectUser(username string) (User, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(fmt.Sprintf("SELECT password FROM users WHERE username = '%s'", username))
+	rows, err := db.Query(fmt.Sprintf("SELECT password,salt FROM users WHERE username = '%s'", username))
 	if err != nil {
 		return User{}, fmt.Errorf("query error: %w", err)
 	}
 	defer rows.Close()
 
 	var password string
+	var salt string
 	for rows.Next() {
 
-		err := rows.Scan(&password)
+		err := rows.Scan(&password, &salt)
 		if err != nil {
 			return User{}, fmt.Errorf("scan error: %w", err)
 		}
@@ -40,7 +42,7 @@ func SelectUser(username string) (User, error) {
 		return User{}, fmt.Errorf("rows error: %w", err)
 	}
 
-	return User{Username: username, Password: password}, nil
+	return User{Username: username, Password: password, Salt: salt}, nil
 }
 
 func buildConnectionString() string {

@@ -1,0 +1,1 @@
+ALTER table users ADD salt VARCHAR(36);
