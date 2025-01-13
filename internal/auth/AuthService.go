@@ -45,7 +45,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		// Write a response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, `{"status":"success","message":"Data received"}`)
+		fmt.Fprintf(w, fmt.Sprintf("{\"username\" : \"%s\"}", reqData.Username))
 	} else {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
