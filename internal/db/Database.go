@@ -15,7 +15,8 @@ type User struct {
 
 func SelectUser(username string) (User, error) {
 
-	connStr := buildConnectionString()
+	//connStr := buildConnectionString()
+	connStr := *config.GetDBConfig().ConnectionString
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
@@ -43,10 +44,4 @@ func SelectUser(username string) (User, error) {
 	}
 
 	return User{Username: username, Password: password, Salt: salt}, nil
-}
-
-func buildConnectionString() string {
-	conf := config.GetDBConfig()
-
-	return fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable", conf.Username, conf.Password, conf.Host, conf.Database)
 }

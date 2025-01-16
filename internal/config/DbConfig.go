@@ -1,18 +1,28 @@
 package config
 
 type DBConfig struct {
-	Username string
-	Password string
-	Host     string
-	Database string
+	Username         string
+	Password         string
+	Host             string
+	Database         string
+	ConnectionString *string
 }
 
-func GetDBConfig() DBConfig {
+var dbConfig *DBConfig
 
-	return DBConfig{
-		Username: "richard",
-		Password: "Onlyone1",
-		Host:     "localhost",
-		Database: "richard",
+func GetDBConfig() *DBConfig {
+
+	return dbConfig
+}
+
+func SetDBConfig(connectionString *string) {
+	dbConfig = &DBConfig{
+		Username:         "",
+		Password:         "",
+		Host:             "",
+		Database:         "",
+		ConnectionString: connectionString,
 	}
 }
+
+//postgres://richard:Onlyone1@localhost:5432/richard?sslmode=disable

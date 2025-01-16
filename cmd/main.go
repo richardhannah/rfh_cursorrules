@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"flag"
 	"github.com/sashabaranov/go-openai"
 	"log"
 	"net/http"
 	"totmapi/internal/auth"
+	"totmapi/internal/config"
 	"totmapi/internal/health"
 )
 
@@ -21,6 +22,10 @@ type OpenAIResponse struct {
 
 func main() {
 
+	connectionString := flag.String("connstring", "", "")
+	flag.Parse()
+	config.SetDBConfig(connectionString)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/openai/prompt", Handler)
 	mux.HandleFunc("/hello", health.Hello)
@@ -32,8 +37,6 @@ func main() {
 
 	// Start the server
 	http.ListenAndServe(":5150", handlerWithCORS)
-
-	fmt.Print("hello world")
 
 }
 
@@ -104,9 +107,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		log.Println("No response received from the API.")
 		return
 	}
-
-	// Print out the response from ChatGPT
-	fmt.Println("ChatGPT says:")
 
 	respnse := OpenAIResponse{Response: resp.Choices[0].Message.Content}
 	w.Header().Set("Content-Type", "application/json")

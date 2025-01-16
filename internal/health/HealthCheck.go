@@ -17,8 +17,8 @@ func Hello(w http.ResponseWriter, r *http.Request) {
 func DatabaseHealth(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "checking db health")
 
-	connStr := buildConnectionString()
-	fmt.Println(connStr)
+	connStr := *config.GetDBConfig().ConnectionString
+
 	// Open a connection to the database
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -37,13 +37,6 @@ func DatabaseHealth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Error querying 'person' table: %v", err)
 	}
-
-}
-
-func buildConnectionString() string {
-	conf := config.GetDBConfig()
-
-	return fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable", conf.Username, conf.Password, conf.Host, conf.Database)
 }
 
 // getAllPersons queries the 'person' table and prints the results.

@@ -26,3 +26,7 @@ ignoreNewlinesInTextObjects = "off"
 url = "jdbc:postgresql://localhost:5432/"
 schemas = [ "richard" ]
 displayName = "totm-local"
+
+[environments.totm-prod]
+url = "jdbc:postgresql://dpg-ctblrft6l47c73b2hj4g-a.frankfurt-postgres.render.com:5432/totmdb"
+schemas = [ "totm" ]
