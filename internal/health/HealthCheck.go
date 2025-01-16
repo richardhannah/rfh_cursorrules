@@ -42,7 +42,7 @@ func DatabaseHealth(w http.ResponseWriter, r *http.Request) {
 // getAllPersons queries the 'person' table and prints the results.
 // Adjust the code to match your actual schema (column names/types).
 func getAllPersons(db *sql.DB) error {
-	rows, err := db.Query("SELECT * FROM person")
+	rows, err := db.Query("SELECT * FROM PERSON")
 	if err != nil {
 		return fmt.Errorf("query error: %w", err)
 	}
