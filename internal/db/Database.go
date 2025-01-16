@@ -23,7 +23,7 @@ func SelectUser(username string) (User, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(fmt.Sprintf("SELECT password,salt FROM Users WHERE username = '%s'", username))
+	rows, err := db.Query(fmt.Sprintf("SELECT password,salt FROM users WHERE username = '%s'", username))
 	if err != nil {
 		return User{}, fmt.Errorf("query error: %w", err)
 	}
