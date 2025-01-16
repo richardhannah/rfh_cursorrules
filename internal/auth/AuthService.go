@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"totmapi/internal/db"
 )
@@ -28,10 +27,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
-
-	// Process the data (e.g., validation, saving to DB, etc.)
-	// For demonstration, just print it out
-	log.Printf("Received: Username=%s, Password=%s\n", reqData.Username, reqData.Password)
 
 	user, err := db.SelectUser(reqData.Username)
 	if err != nil {
