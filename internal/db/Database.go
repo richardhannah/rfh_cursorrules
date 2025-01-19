@@ -12,6 +12,7 @@ type User struct {
 	Username string
 	Password string
 	Salt     string
+	Role     string
 }
 
 func InsertUser(username string, password string, salt string) error {
@@ -50,7 +51,7 @@ func SelectUser(username string) (User, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(fmt.Sprintf("SELECT password,salt FROM totm.users WHERE username = '%s'", username))
+	rows, err := db.Query(fmt.Sprintf("SELECT password,salt,role FROM totm.users WHERE username = '%s'", username))
 	if err != nil {
 		return User{}, fmt.Errorf("query error: %w", err)
 	}
@@ -58,9 +59,11 @@ func SelectUser(username string) (User, error) {
 
 	var password string
 	var salt string
+	var role string
+
 	for rows.Next() {
 
-		err := rows.Scan(&password, &salt)
+		err := rows.Scan(&password, &salt, &role)
 		if err != nil {
 			return User{}, fmt.Errorf("scan error: %w", err)
 		}
@@ -70,5 +73,5 @@ func SelectUser(username string) (User, error) {
 		return User{}, fmt.Errorf("rows error: %w", err)
 	}
 
-	return User{Username: username, Password: password, Salt: salt}, nil
+	return User{Username: username, Password: password, Salt: salt, Role: role}, nil
 }

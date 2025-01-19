@@ -22,6 +22,12 @@ type RegistrationRequest struct {
 	Password string `json:"password"`
 }
 
+type AuthResponse struct {
+	Username string `json:"username"`
+	Token    string `json:"token"`
+	Role     string `json:"role"`
+}
+
 var jwtSecret = []byte("mySecretKey")
 
 func LoginJwt(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +62,20 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 			// Write a response
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprintf(w, fmt.Sprintf("{\"username\" : \"%s\",\"token\" : \"%s\"}", reqData.Username, token))
+
+			authresponse := AuthResponse{
+				Username: reqData.Username,
+				Token:    token,
+				Role:     user.Role,
+			}
+
+			json, err := json.Marshal(authresponse)
+			if err != nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+			}
+
+			fmt.Fprintf(w, fmt.Sprintf(string(json)))
 		}
 
 	} else {
@@ -83,9 +102,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	user := reqData.Username
 	pass := reqData.Password
 	salt := uuid.New().String()
+	saltedPass := hashit(pass + salt)
 	token, err := generateToken(reqData.Username)
 
-	err = db.InsertUser(user, pass, salt)
+	err = db.InsertUser(user, saltedPass, salt)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
@@ -93,7 +113,20 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		// Write a response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, fmt.Sprintf("{\"username\" : \"%s\",\"token\" : \"%s\"}", reqData.Username, token))
+
+		authresponse := AuthResponse{
+			Username: reqData.Username,
+			Token:    token,
+			Role:     "standard",
+		}
+
+		json, err := json.Marshal(authresponse)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		fmt.Fprintf(w, fmt.Sprintf(string(json)))
 	}
 
 }
