@@ -6,12 +6,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"net/http"
 	"time"
 	"totmapi/internal/db"
 )
 
 type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type RegistrationRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
@@ -60,6 +66,38 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func Register(w http.ResponseWriter, r *http.Request) {
+	// Ensure this is a POST request
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse the JSON body
+	var reqData RegistrationRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	user := reqData.Username
+	pass := reqData.Password
+	salt := uuid.New().String()
+	token, err := generateToken(reqData.Username)
+
+	err = db.InsertUser(user, pass, salt)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		// Write a response
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, fmt.Sprintf("{\"username\" : \"%s\",\"token\" : \"%s\"}", reqData.Username, token))
+	}
+
+}
+
 // generateToken creates a JWT token with standard claims plus a subject
 func generateToken(username string) (string, error) {
 	// Add claims
@@ -74,40 +112,6 @@ func generateToken(username string) (string, error) {
 
 	// Sign with your secret
 	return token.SignedString(jwtSecret)
-}
-
-func Login(w http.ResponseWriter, r *http.Request) {
-	// Ensure this is a POST request
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Parse the JSON body
-	var reqData LoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
-		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	user, err := db.SelectUser(reqData.Username)
-	if err != nil {
-		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	inputPass := hashit(reqData.Password + user.Salt)
-
-	if user.Password == inputPass {
-		// Write a response
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, fmt.Sprintf("{\"username\" : \"%s\"}", reqData.Username))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-	}
-
 }
 
 func hashit(saltedPass string) string {

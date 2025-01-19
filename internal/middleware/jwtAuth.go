@@ -30,6 +30,12 @@ func JwtAuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		// If path is /login, skip JWT validation
+		if r.URL.Path == "/register" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		// If OPTIONS Request, skip JWT validation
 		if r.Method == http.MethodOptions {
 			next.ServeHTTP(w, r)

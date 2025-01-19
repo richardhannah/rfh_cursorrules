@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"totmapi/internal/config"
 )
@@ -13,9 +14,35 @@ type User struct {
 	Salt     string
 }
 
+func InsertUser(username string, password string, salt string) error {
+
+	connStr := *config.GetDBConfig().ConnectionString
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer db.Close()
+
+	// Example SQL statement using placeholders
+	query := `
+        INSERT INTO totm.users (id,username, password, salt)
+        VALUES ($1, $2, $3, $4)
+    `
+
+	id := uuid.New().String()
+	// Execute the INSERT
+	_, err = db.Exec(query, id, username, password, salt)
+	if err != nil {
+		fmt.Println(err.Error())
+		return fmt.Errorf("insertUser: %v", err)
+	}
+
+	return nil
+
+}
+
 func SelectUser(username string) (User, error) {
 
-	//connStr := buildConnectionString()
 	connStr := *config.GetDBConfig().ConnectionString
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

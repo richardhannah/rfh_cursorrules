@@ -12,6 +12,11 @@ import (
 	"totmapi/internal/open_ai"
 )
 
+type MyData struct {
+	Title string `json:"title"`
+	Body  string `json:"body"`
+}
+
 func main() {
 
 	connectionString := os.Getenv("TOTM_CONN_STRING")
@@ -22,11 +27,13 @@ func main() {
 	mux.HandleFunc("/hello", health.Hello)
 	mux.HandleFunc("/database", health.DatabaseHealth)
 	mux.HandleFunc("/login", auth.LoginJwt)
+	mux.HandleFunc("/register", auth.Register)
 
 	handlerCORS := middleware.CorsMiddleware(mux)
 	handlerAuth := middleware.JwtAuthMiddleware(handlerCORS)
+	handlerSanitize := middleware.JsonSanitizeMiddleware(handlerAuth)
 
-	http.ListenAndServe(":5150", handlerAuth)
+	http.ListenAndServe(":5150", handlerSanitize)
 
 }
 

@@ -24,5 +24,3 @@ func SetDBConfig(connectionString *string) {
 		ConnectionString: connectionString,
 	}
 }
-
-//postgres://richard:Onlyone1@localhost:5432/richard?sslmode=disable
