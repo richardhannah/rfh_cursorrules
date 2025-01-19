@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/base64"
-	"flag"
 	"net/http"
+	"os"
 	"strings"
 	"totmapi/internal/auth"
 	"totmapi/internal/config"
@@ -13,9 +13,9 @@ import (
 )
 
 func main() {
-	connectionString := flag.String("connstring", "", "")
-	flag.Parse()
-	config.SetDBConfig(connectionString)
+
+	connectionString := os.Getenv("TOTM_CONN_STRING")
+	config.SetDBConfig(&connectionString)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/openai/prompt", open_ai.Handler)
