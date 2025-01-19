@@ -1,38 +1,14 @@
-package main
+package middleware
 
 import (
 	"encoding/base64"
-	"flag"
 	"net/http"
 	"strings"
-	"totmapi/internal/auth"
-	"totmapi/internal/config"
-	"totmapi/internal/health"
-	"totmapi/internal/middleware"
-	"totmapi/internal/open_ai"
 )
-
-func main() {
-	connectionString := flag.String("connstring", "", "")
-	flag.Parse()
-	config.SetDBConfig(connectionString)
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/openai/prompt", open_ai.Handler)
-	mux.HandleFunc("/hello", health.Hello)
-	mux.HandleFunc("/database", health.DatabaseHealth)
-	mux.HandleFunc("/login", auth.LoginJwt)
-
-	handlerCORS := middleware.CorsMiddleware(mux)
-	handlerAuth := middleware.JwtAuthMiddleware(handlerCORS)
-
-	http.ListenAndServe(":5150", handlerAuth)
-
-}
 
 // basicAuthMiddleware enforces Basic Authentication. Only requests with valid credentials
 // pass through to the next handler.
-func basicAuthMiddleware(next http.Handler) http.Handler {
+func BasicAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check for an "Authorization" header
 		authHeader := r.Header.Get("Authorization")
