@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"log"
+	"time"
 	"totmapi/internal/config"
 )
 
@@ -13,6 +14,16 @@ type User struct {
 	Password string
 	Salt     string
 	Role     string
+}
+
+type BlogPost struct {
+	BlogPostId string
+	Title      string
+	Markdown   string
+	Category   string
+	Image      string
+	Video      sql.NullString
+	Date       time.Time
 }
 
 func InsertUser(username string, password string, salt string) error {
@@ -74,4 +85,46 @@ func SelectUser(username string) (User, error) {
 	}
 
 	return User{Username: username, Password: password, Salt: salt, Role: role}, nil
+}
+
+func SelectBlogPosts() ([]BlogPost, error) {
+
+	connStr := *config.GetDBConfig().ConnectionString
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query(fmt.Sprintf("SELECT * FROM totm.blogposts"))
+	if err != nil {
+		return []BlogPost{}, fmt.Errorf("query error: %w", err)
+	}
+	defer rows.Close()
+
+	var blogpostid string
+	var title string
+	var markdown string
+	var category string
+	var image string
+	var video sql.NullString
+	var date time.Time
+
+	var posts []BlogPost
+
+	for rows.Next() {
+
+		err := rows.Scan(&blogpostid, &title, &markdown, &category, &image, &video, &date)
+		if err != nil {
+			return []BlogPost{}, fmt.Errorf("scan error: %w", err)
+		}
+		posts = append(posts, BlogPost{BlogPostId: blogpostid, Title: title, Markdown: markdown, Category: category, Image: image, Video: video, Date: date})
+	}
+
+	if err := rows.Err(); err != nil {
+		return []BlogPost{}, fmt.Errorf("rows error: %w", err)
+	}
+
+	return posts, nil
+
 }
