@@ -36,6 +36,11 @@ func JwtAuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		if r.URL.Path == "/blogposts" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		// If OPTIONS Request, skip JWT validation
 		if r.Method == http.MethodOptions {
 			next.ServeHTTP(w, r)

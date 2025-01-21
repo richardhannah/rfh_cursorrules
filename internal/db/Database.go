@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"log"
+	"sort"
 	"time"
 	"totmapi/internal/config"
 )
@@ -17,13 +18,13 @@ type User struct {
 }
 
 type BlogPost struct {
-	BlogPostId string
-	Title      string
-	Markdown   string
-	Category   string
-	Image      string
-	Video      sql.NullString
-	Date       time.Time
+	BlogPostId string         `json:"blogpostid"`
+	Title      string         `json:"title"`
+	Markdown   string         `json:"markdown"`
+	Category   string         `json:"category"`
+	Image      sql.NullString `json:"image"`
+	Video      sql.NullString `json:"video"`
+	Date       time.Time      `json:"date"`
 }
 
 func InsertUser(username string, password string, salt string) error {
@@ -106,7 +107,7 @@ func SelectBlogPosts() ([]BlogPost, error) {
 	var title string
 	var markdown string
 	var category string
-	var image string
+	var image sql.NullString
 	var video sql.NullString
 	var date time.Time
 
@@ -125,6 +126,17 @@ func SelectBlogPosts() ([]BlogPost, error) {
 		return []BlogPost{}, fmt.Errorf("rows error: %w", err)
 	}
 
+	sortPostsDescending(posts)
+
 	return posts, nil
 
+}
+
+func sortPostsDescending(posts []BlogPost) {
+	sort.Slice(posts, func(i, j int) bool {
+		// Return true if posts[i] should appear before posts[j].
+		// For newest first, we want the more recent date to come first.
+		// So compare using Date.After(...).
+		return posts[i].Date.After(posts[j].Date)
+	})
 }
