@@ -88,6 +88,36 @@ func SelectUser(username string) (User, error) {
 	return User{Username: username, Password: password, Salt: salt, Role: role}, nil
 }
 
+func UpdatePassword(username string, newpassword string) error {
+
+	// Get the PostgreSQL connection string from your config
+	connStr := *config.GetDBConfig().ConnectionString
+
+	// Open the database connection
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer db.Close()
+
+	// Build the UPDATE query
+	// We only need two parameters: new password and username
+	query := `
+        UPDATE totm.users
+        SET password = $1
+        WHERE username = $2
+    `
+
+	// Execute the update with the new password and the username
+	_, err = db.Exec(query, newpassword, username)
+	if err != nil {
+		fmt.Println(err.Error())
+		return fmt.Errorf("UpdatePassword: %v", err)
+	}
+
+	return nil
+}
+
 func SelectBlogPosts() ([]BlogPost, error) {
 
 	connStr := *config.GetDBConfig().ConnectionString

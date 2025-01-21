@@ -28,6 +28,7 @@ func main() {
 	mux.HandleFunc("/login", auth.LoginJwt)
 	mux.HandleFunc("/register", auth.Register)
 	mux.HandleFunc("/blogposts", blog.BlogHandler)
+	mux.HandleFunc("/changepass", auth.Changepass)
 
 	handlerCORS := middleware.CorsMiddleware(mux)
 	handlerAuth := middleware.JwtAuthMiddleware(handlerCORS)

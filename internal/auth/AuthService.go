@@ -28,6 +28,12 @@ type AuthResponse struct {
 	Role     string `json:"role"`
 }
 
+type ChangePassRequest struct {
+	Username    string `json:"username"`
+	OldPassword string `json:"oldpassword"`
+	NewPassword string `json:"newpassword"`
+}
+
 var jwtSecret = []byte("mySecretKey")
 
 func LoginJwt(w http.ResponseWriter, r *http.Request) {
@@ -127,6 +133,39 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		}
 
 		fmt.Fprintf(w, fmt.Sprintf(string(json)))
+	}
+
+}
+
+func Changepass(w http.ResponseWriter, r *http.Request) {
+	// Ensure this is a POST request
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse the JSON body
+	var reqData ChangePassRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	user, err := db.SelectUser(reqData.Username)
+	if err != nil {
+		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	inputPass := hashit(reqData.OldPassword + user.Salt)
+
+	if user.Password == inputPass {
+		db.UpdatePassword(reqData.Username, hashit(reqData.NewPassword+user.Salt))
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
 	}
 
 }
