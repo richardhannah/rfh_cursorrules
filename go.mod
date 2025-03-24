@@ -8,6 +8,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/sashabaranov/go-openai v1.36.1
+	github.com/gorilla/mux v1.8.1
 )
 
 require (

@@ -21,7 +21,7 @@ const (
 
 // jwtAuthMiddleware checks for a Bearer token in the Authorization header,
 // validates it, and either returns 401 or calls next handler.
-func JwtAuthMiddleware(next http.Handler) http.Handler {
+func JwtAuthMiddleware(next http.Handler, x map[string]string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// If path is /login, skip JWT validation

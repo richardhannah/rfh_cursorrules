@@ -3,13 +3,51 @@ package blog
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"totmapi/internal/db"
 )
 
 func BlogHandler(w http.ResponseWriter, r *http.Request) {
 
-	blogposts, err := db.SelectBlogPosts()
+	vars := mux.Vars(r)
+	id := vars["id"]
+	fmt.Println(fmt.Sprintf("Book ID: %s", id))
+
+	switch httpmethod := r.Method; httpmethod {
+	case http.MethodGet:
+		listBlogPosts(w, r)
+	case http.MethodPost:
+		fmt.Println("posting")
+	case http.MethodPut:
+		fmt.Println("putting")
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+func create(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func read(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func update(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func delete(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func listBlogPosts(w http.ResponseWriter, r *http.Request) {
+	queryParams := r.URL.Query()
+	published := queryParams.Get("published")
+
+	blogposts, err := db.SelectBlogPosts(published)
 	if err != nil {
 		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
 		return
@@ -22,5 +60,4 @@ func BlogHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, fmt.Sprintf(string(json)))
-
 }

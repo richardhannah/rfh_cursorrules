@@ -17,15 +17,24 @@ type User struct {
 	Role     string
 }
 
-type BlogPost struct {
-	BlogPostId string         `json:"blogpostid"`
-	Title      string         `json:"title"`
-	Markdown   string         `json:"markdown"`
-	Category   string         `json:"category"`
-	Image      sql.NullString `json:"image"`
-	Video      sql.NullString `json:"video"`
-	Date       time.Time      `json:"date"`
+type DBContext struct {
+	dbContext *sql.DB
 }
+
+func NewDBContext() DBContext {
+	connStr := *config.GetDBConfig().ConnectionString
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer db.Close()
+	return DBContext{db}
+}
+
+//func (dbc *DBContext) Query[T any](sqlQuery string) T {
+//	var result T
+//	return result
+//}
 
 func InsertUser(username string, password string, salt string) error {
 
@@ -118,7 +127,17 @@ func UpdatePassword(username string, newpassword string) error {
 	return nil
 }
 
-func SelectBlogPosts() ([]BlogPost, error) {
+func SelectBlogPosts(publishedParam string) ([]BlogPost, error) {
+
+	publishedParamConstraint := "WHERE published = true"
+
+	if publishedParam == "all" {
+		publishedParamConstraint = ""
+	}
+
+	if publishedParam == "false" {
+		publishedParamConstraint = "WHERE published = false"
+	}
 
 	connStr := *config.GetDBConfig().ConnectionString
 	db, err := sql.Open("postgres", connStr)
@@ -127,7 +146,7 @@ func SelectBlogPosts() ([]BlogPost, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(fmt.Sprintf("SELECT * FROM totm.blogposts"))
+	rows, err := db.Query(fmt.Sprintf("SELECT * FROM totm.blogposts %s", publishedParamConstraint))
 	if err != nil {
 		return []BlogPost{}, fmt.Errorf("query error: %w", err)
 	}
@@ -140,12 +159,13 @@ func SelectBlogPosts() ([]BlogPost, error) {
 	var image sql.NullString
 	var video sql.NullString
 	var date time.Time
+	var published bool
 
 	var posts []BlogPost
 
 	for rows.Next() {
 
-		err := rows.Scan(&blogpostid, &title, &markdown, &category, &image, &video, &date)
+		err := rows.Scan(&blogpostid, &title, &markdown, &category, &image, &video, &date, &published)
 		if err != nil {
 			return []BlogPost{}, fmt.Errorf("scan error: %w", err)
 		}
