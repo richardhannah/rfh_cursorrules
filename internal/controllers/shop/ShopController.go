@@ -8,7 +8,7 @@ import (
 )
 
 func SetRoutes(router *mux.Router) {
-	router.HandleFunc("/shop", Handler)
+	router.HandleFunc("/shop/{shopid}", Handler)
 }
 
 func init() {
@@ -16,5 +16,6 @@ func init() {
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "hello world")
+	queryParams := r.URL.Query()
+	fmt.Println(queryParams)
 }

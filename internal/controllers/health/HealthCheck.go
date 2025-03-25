@@ -3,12 +3,23 @@ package health
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"totmapi/internal/config"
+	"totmapi/internal/controllers"
 
 	_ "github.com/lib/pq"
 )
+
+func SetRoutes(router *mux.Router) {
+	router.HandleFunc("/hello", Hello)
+	router.HandleFunc("/database", DatabaseHealth)
+}
+
+func init() {
+	controllers.RegisterRouteSetter(SetRoutes)
+}
 
 func Hello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "hello world")

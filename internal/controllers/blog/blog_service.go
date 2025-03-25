@@ -5,10 +5,20 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"totmapi/internal/controllers"
 	"totmapi/internal/db"
 )
 
-func BlogHandler(w http.ResponseWriter, r *http.Request) {
+func SetRoutes(router *mux.Router) {
+	router.HandleFunc("/blogposts/{id}", Handler).Methods(http.MethodGet)
+	router.HandleFunc("/blogposts", Handler).Methods(http.MethodGet)
+}
+
+func init() {
+	controllers.RegisterRouteSetter(SetRoutes)
+}
+
+func Handler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]

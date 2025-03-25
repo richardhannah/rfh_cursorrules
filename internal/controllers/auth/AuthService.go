@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	"totmapi/internal/controllers"
 	"totmapi/internal/db"
 )
 
@@ -35,6 +37,16 @@ type ChangePassRequest struct {
 }
 
 var jwtSecret = []byte("mySecretKey")
+
+func SetRoutes(router *mux.Router) {
+	router.HandleFunc("/login", LoginJwt)
+	router.HandleFunc("/register", Register)
+	router.HandleFunc("/changepass", Changepass)
+}
+
+func init() {
+	controllers.RegisterRouteSetter(SetRoutes)
+}
 
 func LoginJwt(w http.ResponseWriter, r *http.Request) {
 	// Ensure this is a POST request

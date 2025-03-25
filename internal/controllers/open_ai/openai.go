@@ -3,9 +3,11 @@ package open_ai
 import (
 	"context"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/sashabaranov/go-openai"
 	"log"
 	"net/http"
+	"totmapi/internal/controllers"
 )
 
 type PromptRequest struct {
@@ -14,6 +16,15 @@ type PromptRequest struct {
 
 type OpenAIResponse struct {
 	Response string `json:"response"`
+}
+
+func SetRoutes(router *mux.Router) {
+	router.HandleFunc("/openai/prompt", Handler)
+
+}
+
+func init() {
+	controllers.RegisterRouteSetter(SetRoutes)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
