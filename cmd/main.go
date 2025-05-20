@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
 	"net/http"
 	"os"
 	"totmapi/internal/config"

@@ -37,19 +37,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func create(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func read(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func update(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func delete(w http.ResponseWriter, r *http.Request) {
+func getSinglePost(id string) {
 
 }
 
@@ -70,4 +58,20 @@ func listBlogPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, fmt.Sprintf(string(json)))
+}
+
+func create(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func read(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func update(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func delete(w http.ResponseWriter, r *http.Request) {
+
 }

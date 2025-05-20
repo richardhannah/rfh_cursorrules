@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 	"log"
 	"sort"
 	"time"
@@ -17,10 +18,21 @@ type User struct {
 	Role     string
 }
 
-//func (dbc *DBContext) Query[T any](sqlQuery string) T {
-//	var result T
-//	return result
-//}
+func Query(query string) *sql.Rows {
+	connStr := *config.GetDBConfig().ConnectionString
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Printf("Failed to query Db")
+		return nil
+	}
+	return rows
+}
 
 func InsertUser(username string, password string, salt string) error {
 
