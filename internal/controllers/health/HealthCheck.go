@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"totmapi/internal/config"
 	"totmapi/internal/controllers"
-
-	_ "github.com/lib/pq"
 )
 
 func SetRoutes(router *mux.Router) {

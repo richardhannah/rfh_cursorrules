@@ -1,0 +1,1 @@
+alter table totm.shop_stock ADD cost int not null

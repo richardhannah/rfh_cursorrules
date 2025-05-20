@@ -17,20 +17,6 @@ type User struct {
 	Role     string
 }
 
-type DBContext struct {
-	dbContext *sql.DB
-}
-
-func NewDBContext() DBContext {
-	connStr := *config.GetDBConfig().ConnectionString
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
-	}
-	defer db.Close()
-	return DBContext{db}
-}
-
 //func (dbc *DBContext) Query[T any](sqlQuery string) T {
 //	var result T
 //	return result
