@@ -10,7 +10,7 @@ type Blogposts struct {
 	Markdown   sql.NullString `db:"markdown"`
 	Category   sql.NullString `db:"category"`
 	Image      sql.NullString `db:"image"`
-	VIDeo      sql.NullString `db:"video"`
+	Video      sql.NullString `db:"video"`
 	Date       sql.NullTime   `db:"date"`
 	Published  bool           `db:"published"`
 }

@@ -3,55 +3,45 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"time"
+	"totmapi/internal/models"
 )
 
 type BlogPostRepository struct {
 }
 
-type BlogPost struct {
-	BlogPostId string         `json:"blogpostid"`
-	Title      string         `json:"title"`
-	Markdown   string         `json:"markdown"`
-	Category   string         `json:"category"`
-	Image      sql.NullString `json:"image"`
-	Video      sql.NullString `json:"video"`
-	Date       time.Time      `json:"date"`
-}
-
 func (b BlogPostRepository) Insert() {}
-func (b BlogPostRepository) Select(id string) (BlogPost, error) {
+func (b BlogPostRepository) Select(id string) (models.Blogposts, error) {
 
 	sqlquery := fmt.Sprintf("SELECT from blogposts where id = %s", id)
 	rows := Query(sqlquery)
 	defer rows.Close()
 
 	var blogpostid string
-	var title string
-	var markdown string
-	var category string
+	var title sql.NullString
+	var markdown sql.NullString
+	var category sql.NullString
 	var image sql.NullString
 	var video sql.NullString
-	var date time.Time
+	var date sql.NullTime
 	var published bool
 
-	var posts []BlogPost
+	var posts []models.Blogposts
 
 	for rows.Next() {
 
 		err := rows.Scan(&blogpostid, &title, &markdown, &category, &image, &video, &date, &published)
 		if err != nil {
-			return BlogPost{}, fmt.Errorf("scan error: %w", err)
+			return models.Blogposts{}, fmt.Errorf("scan error: %w", err)
 		}
-		posts = append(posts, BlogPost{BlogPostId: blogpostid, Title: title, Markdown: markdown, Category: category, Image: image, Video: video, Date: date})
+		posts = append(posts, models.Blogposts{BlogpostID: blogpostid, Title: title, Markdown: markdown, Category: category, Image: image, Video: video, Date: date})
 	}
 
 	if err := rows.Err(); err != nil {
-		return BlogPost{}, fmt.Errorf("rows error: %w", err)
+		return models.Blogposts{}, fmt.Errorf("rows error: %w", err)
 	}
 
 	if len(posts) > 1 {
-		return BlogPost{}, fmt.Errorf("too many rows returned")
+		return models.Blogposts{}, fmt.Errorf("too many rows returned")
 	}
 
 	return posts[0], nil

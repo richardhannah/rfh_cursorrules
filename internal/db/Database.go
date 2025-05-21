@@ -6,9 +6,8 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"log"
-	"sort"
-	"time"
 	"totmapi/internal/config"
+	"totmapi/internal/models"
 )
 
 type User struct {
@@ -125,7 +124,7 @@ func UpdatePassword(username string, newpassword string) error {
 	return nil
 }
 
-func SelectBlogPosts(publishedParam string) ([]BlogPost, error) {
+func SelectBlogPosts(publishedParam string) ([]models.Blogposts, error) {
 
 	publishedParamConstraint := "WHERE published = true"
 
@@ -146,45 +145,45 @@ func SelectBlogPosts(publishedParam string) ([]BlogPost, error) {
 
 	rows, err := db.Query(fmt.Sprintf("SELECT * FROM totm.blogposts %s", publishedParamConstraint))
 	if err != nil {
-		return []BlogPost{}, fmt.Errorf("query error: %w", err)
+		return []models.Blogposts{}, fmt.Errorf("query error: %w", err)
 	}
 	defer rows.Close()
 
 	var blogpostid string
-	var title string
-	var markdown string
-	var category string
+	var title sql.NullString
+	var markdown sql.NullString
+	var category sql.NullString
 	var image sql.NullString
 	var video sql.NullString
-	var date time.Time
+	var date sql.NullTime
 	var published bool
 
-	var posts []BlogPost
+	var posts []models.Blogposts
 
 	for rows.Next() {
 
 		err := rows.Scan(&blogpostid, &title, &markdown, &category, &image, &video, &date, &published)
 		if err != nil {
-			return []BlogPost{}, fmt.Errorf("scan error: %w", err)
+			return []models.Blogposts{}, fmt.Errorf("scan error: %w", err)
 		}
-		posts = append(posts, BlogPost{BlogPostId: blogpostid, Title: title, Markdown: markdown, Category: category, Image: image, Video: video, Date: date})
+		posts = append(posts, models.Blogposts{BlogpostID: blogpostid, Title: title, Markdown: markdown, Category: category, Image: image, Video: video, Date: date})
 	}
 
 	if err := rows.Err(); err != nil {
-		return []BlogPost{}, fmt.Errorf("rows error: %w", err)
+		return []models.Blogposts{}, fmt.Errorf("rows error: %w", err)
 	}
 
-	sortPostsDescending(posts)
+	//sortPostsDescending(posts)
 
 	return posts, nil
 
 }
 
-func sortPostsDescending(posts []BlogPost) {
-	sort.Slice(posts, func(i, j int) bool {
-		// Return true if posts[i] should appear before posts[j].
-		// For newest first, we want the more recent date to come first.
-		// So compare using Date.After(...).
-		return posts[i].Date.After(posts[j].Date)
-	})
-}
+//func sortPostsDescending(posts []models.Blogposts) {
+//	sort.Slice(posts, func(i, j int) bool {
+//		// Return true if posts[i] should appear before posts[j].
+//		// For newest first, we want the more recent date to come first.
+//		// So compare using Date.After(...).
+//		return posts[i].Date.After(posts[j].Date)
+//	})
+//}
