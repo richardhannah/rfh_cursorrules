@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
+	"reflect"
+	"strings"
 	"totmapi/internal/config"
-	"totmapi/internal/models"
 )
 
 type DbContext struct {
@@ -22,16 +23,14 @@ func NewDbContext() *DbContext {
 	return &DbContext{db}
 }
 
-func (d DbContext) Select() string {
-	var posts []models.Blogposts
-	// this will do: rows.Columns(), map col→field by `db` tag, scan for you
-	err := d.db.Select(&posts, `SELECT blogpostid, title, markdown, category, image, video, date, published
-                             FROM blogposts`)
+func (d DbContext) Select(model interface{}) error {
+	//var dest []models.Blogposts
+	err := d.db.Select(&model, fmt.Sprintf(`SELECT * FROM  %s`, modelTypeName(model)))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return err
 	}
-	fmt.Sprintf(posts[0].Title.String)
-	return posts[1].Title.String
+	return nil
 }
 
 func (d DbContext) QueryDB(query string) *sql.Rows {
@@ -45,4 +44,27 @@ func (d DbContext) QueryDB(query string) *sql.Rows {
 
 func (d DbContext) Close() {
 	d.db.Close()
+}
+
+func modelTypeName(model interface{}) string {
+	t := reflect.TypeOf(model)
+	// If someone passes a pointer to a model, dereference it
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	// Make sure it really is a model
+	if t.Kind() != reflect.Slice {
+		return ""
+	}
+	elem := t.Elem()
+	// If it’s a named type in a package, PkgPath() != ""
+	if pkg := elem.PkgPath(); pkg != "" {
+		return strings.ToLower(elem.Name())
+	}
+	// Built-ins (e.g. int, string) or unnamed types
+	if elem.Name() != "" {
+		return elem.Name()
+	}
+
+	return elem.String()
 }

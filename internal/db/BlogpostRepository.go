@@ -7,6 +7,11 @@ import (
 )
 
 type BlogPostRepository struct {
+	dbContext *DbContext
+}
+
+func NewBlogPostRepository(ctx *DbContext) BlogPostRepository {
+	return BlogPostRepository{dbContext: ctx}
 }
 
 func (b BlogPostRepository) Insert() {}
