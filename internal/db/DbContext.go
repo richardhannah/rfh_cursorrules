@@ -11,7 +11,7 @@ import (
 )
 
 type DbContext struct {
-	db *sqlx.DB
+	DB *sqlx.DB
 }
 
 func NewDbContext() *DbContext {
@@ -20,21 +20,20 @@ func NewDbContext() *DbContext {
 	if err != nil {
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
 	}
-	return &DbContext{db}
+	return &DbContext{DB: db}
 }
 
-func (d DbContext) Select(model interface{}) error {
-	//var dest []models.Blogposts
-	err := d.db.Select(&model, fmt.Sprintf(`SELECT * FROM  %s`, modelTypeName(model)))
+func (d *DbContext) Select(destPtr interface{}) error {
+	table, err := tableName(destPtr)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
-	return nil
+	q := fmt.Sprintf("SELECT * FROM %s", table)
+	return d.DB.Select(destPtr, q) // ← destPtr is already a *[]YourStruct
 }
 
 func (d DbContext) QueryDB(query string) *sql.Rows {
-	rows, err := d.db.Query(query)
+	rows, err := d.DB.Query(query)
 	if err != nil {
 		log.Printf("Failed to query Db")
 		return nil
@@ -43,28 +42,30 @@ func (d DbContext) QueryDB(query string) *sql.Rows {
 }
 
 func (d DbContext) Close() {
-	d.db.Close()
+	d.DB.Close()
 }
 
-func modelTypeName(model interface{}) string {
-	t := reflect.TypeOf(model)
-	// If someone passes a pointer to a model, dereference it
-	if t.Kind() == reflect.Ptr {
-		t = t.Elem()
+func tableName(ptrToSlice interface{}) (string, error) {
+	t := reflect.TypeOf(ptrToSlice)
+	if t.Kind() != reflect.Ptr {
+		return "", fmt.Errorf("Select: expected pointer to slice, got %T", ptrToSlice)
 	}
-	// Make sure it really is a model
+	t = t.Elem()
 	if t.Kind() != reflect.Slice {
-		return ""
+		return "", fmt.Errorf("Select: expected pointer to slice, got pointer to %s", t.Kind())
 	}
 	elem := t.Elem()
-	// If it’s a named type in a package, PkgPath() != ""
-	if pkg := elem.PkgPath(); pkg != "" {
-		return strings.ToLower(elem.Name())
-	}
-	// Built-ins (e.g. int, string) or unnamed types
-	if elem.Name() != "" {
-		return elem.Name()
-	}
+	// If you want snake_case, you can use a small util here:
+	return toSnakeCase(elem.Name()), nil
+}
 
-	return elem.String()
+func toSnakeCase(str string) string {
+	var buf strings.Builder
+	for i, r := range str {
+		if i > 0 && r >= 'A' && r <= 'Z' {
+			buf.WriteRune('_')
+		}
+		buf.WriteRune(r)
+	}
+	return strings.ToLower(buf.String())
 }
