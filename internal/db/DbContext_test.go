@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"totmapi/internal/config"
@@ -34,7 +35,7 @@ func TestSelectBlogPosts(t *testing.T) {
 	fmt.Printf("Loaded %d posts\n", len(posts))
 }
 
-func TestSelectBlogUsers(t *testing.T) {
+func TestSelectUsers(t *testing.T) {
 
 	testSubject := newTestContext(t)
 
@@ -43,4 +44,21 @@ func TestSelectBlogUsers(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Loaded %d users\n", len(posts))
+}
+
+func TestSelectUsersWithPredicate(t *testing.T) {
+
+	testSubject := newTestContext(t)
+
+	var users []models.Users
+
+	predicate := func(sb sq.SelectBuilder) sq.SelectBuilder {
+		return sb.
+			Where(sq.Eq{"enabled": true})
+	}
+
+	if err := testSubject.SelectPredicate(&users, predicate); err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("Loaded %d users\n", len(users))
 }

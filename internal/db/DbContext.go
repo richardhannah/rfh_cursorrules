@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"reflect"
@@ -29,7 +30,25 @@ func (d *DbContext) Select(destPtr interface{}) error {
 		return err
 	}
 	q := fmt.Sprintf("SELECT * FROM %s", table)
-	return d.DB.Select(destPtr, q) // ← destPtr is already a *[]YourStruct
+	return d.DB.Select(destPtr, q)
+}
+
+func (d *DbContext) SelectPredicate(destPtr interface{}, modifier func(sq.SelectBuilder) sq.SelectBuilder) error {
+	table, err := tableName(destPtr)
+	if err != nil {
+		return err
+	}
+
+	sb := sq.Select("*").From(table).
+		PlaceholderFormat(sq.Dollar)
+
+	sb = modifier(sb)
+
+	sqlStr, args, err := sb.ToSql()
+	if err != nil {
+		return err
+	}
+	return d.DB.Select(destPtr, sqlStr, args...)
 }
 
 func (d DbContext) QueryDB(query string) *sql.Rows {

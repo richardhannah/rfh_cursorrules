@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"totmapi/internal/models"
 )
 
@@ -10,8 +11,17 @@ type BlogPostRepository struct {
 	dbContext *DbContext
 }
 
-func NewBlogPostRepository(ctx *DbContext) BlogPostRepository {
-	return BlogPostRepository{dbContext: ctx}
+func NewBlogPostRepository(ctx *DbContext) *BlogPostRepository {
+	return &BlogPostRepository{dbContext: ctx}
+}
+
+func (b BlogPostRepository) SelectAll() []models.Blogposts {
+
+	var posts []models.Blogposts
+	if err := b.dbContext.Select(&posts); err != nil {
+		log.Println("Error selecting all blogposts")
+	}
+	return posts
 }
 
 func (b BlogPostRepository) Insert() {}
