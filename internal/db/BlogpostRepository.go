@@ -26,7 +26,7 @@ func (b BlogPostRepository) SelectAll() []models.Blogposts {
 			OrderBy("date DESC")
 	}
 
-	if err := b.dbContext.SelectPredicate(&posts, predicate); err != nil {
+	if err := b.dbContext.Select(&posts, predicate); err != nil {
 		log.Println(fmt.Sprintf("Error selecting all blogposts %s", err))
 	}
 	return posts

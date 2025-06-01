@@ -6,8 +6,8 @@ import (
 )
 
 type IDbContext interface {
-	Select(destPtr interface{}) error
-	SelectPredicate(destPtr interface{}, modifier func(squirrel.SelectBuilder) squirrel.SelectBuilder) error
+	SelectAll(destPtr interface{}) error
+	Select(destPtr interface{}, modifier func(squirrel.SelectBuilder) squirrel.SelectBuilder) error
 	QueryDB(query string) *sql.Rows
 	Close()
 }

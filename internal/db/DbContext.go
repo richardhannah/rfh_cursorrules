@@ -24,7 +24,7 @@ func NewDbContext() *DbContext {
 	return &DbContext{DB: db}
 }
 
-func (d *DbContext) Select(destPtr interface{}) error {
+func (d *DbContext) SelectAll(destPtr interface{}) error {
 	table, err := tableName(destPtr)
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func (d *DbContext) Select(destPtr interface{}) error {
 	return d.DB.Select(destPtr, q)
 }
 
-func (d *DbContext) SelectPredicate(destPtr interface{}, modifier func(sq.SelectBuilder) sq.SelectBuilder) error {
+func (d *DbContext) Select(destPtr interface{}, modifier func(sq.SelectBuilder) sq.SelectBuilder) error {
 	table, err := tableName(destPtr)
 	if err != nil {
 		return err
@@ -69,11 +69,11 @@ func (d DbContext) Close() {
 func tableName(ptrToSlice interface{}) (string, error) {
 	t := reflect.TypeOf(ptrToSlice)
 	if t.Kind() != reflect.Ptr {
-		return "", fmt.Errorf("Select: expected pointer to slice, got %T", ptrToSlice)
+		return "", fmt.Errorf("SelectAll: expected pointer to slice, got %T", ptrToSlice)
 	}
 	t = t.Elem()
 	if t.Kind() != reflect.Slice {
-		return "", fmt.Errorf("Select: expected pointer to slice, got pointer to %s", t.Kind())
+		return "", fmt.Errorf("SelectAll: expected pointer to slice, got pointer to %s", t.Kind())
 	}
 	elem := t.Elem()
 	// If you want snake_case, you can use a small util here:

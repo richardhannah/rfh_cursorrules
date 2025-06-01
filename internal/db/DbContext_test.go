@@ -29,7 +29,7 @@ func TestSelectBlogPosts(t *testing.T) {
 	testSubject := newTestContext(t)
 
 	var posts []models.Blogposts
-	if err := testSubject.Select(&posts); err != nil {
+	if err := testSubject.SelectAll(&posts); err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Loaded %d posts\n", len(posts))
@@ -40,7 +40,7 @@ func TestSelectUsers(t *testing.T) {
 	testSubject := newTestContext(t)
 
 	var posts []models.Users
-	if err := testSubject.Select(&posts); err != nil {
+	if err := testSubject.SelectAll(&posts); err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Loaded %d users\n", len(posts))
@@ -57,7 +57,7 @@ func TestSelectUsersWithPredicate(t *testing.T) {
 			Where(sq.Eq{"enabled": true})
 	}
 
-	if err := testSubject.SelectPredicate(&users, predicate); err != nil {
+	if err := testSubject.Select(&users, predicate); err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Loaded %d users\n", len(users))
