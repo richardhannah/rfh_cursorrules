@@ -19,7 +19,7 @@ func (b BlogPostRepository) SelectAll() []models.Blogposts {
 
 	var posts []models.Blogposts
 	if err := b.dbContext.Select(&posts); err != nil {
-		log.Println("Error selecting all blogposts")
+		log.Println(fmt.Sprintf("Error selecting all blogposts %s", err))
 	}
 	return posts
 }
