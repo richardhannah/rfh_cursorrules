@@ -17,7 +17,6 @@ type DbContext struct {
 
 func NewDbContext() *DbContext {
 	connStr := *config.GetDBConfig().ConnectionString
-	fmt.Println(connStr)
 	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
