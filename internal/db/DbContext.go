@@ -19,7 +19,6 @@ func NewDbContext() *DbContext {
 	connStr := *config.GetDBConfig().ConnectionString
 	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
-		log.Println(connStr)
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
 	}
 	return &DbContext{DB: db}
