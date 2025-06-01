@@ -22,7 +22,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]
-	fmt.Println(fmt.Sprintf("Book ID: %s", id))
+	fmt.Println(fmt.Sprintf("Blogpost ID: %s", id))
 
 	switch httpmethod := r.Method; httpmethod {
 	case http.MethodGet:

@@ -8,10 +8,10 @@ import (
 )
 
 type BlogPostRepository struct {
-	dbContext *DbContext
+	dbContext IDbContext
 }
 
-func NewBlogPostRepository(ctx *DbContext) *BlogPostRepository {
+func NewBlogPostRepository(ctx IDbContext) *BlogPostRepository {
 	return &BlogPostRepository{dbContext: ctx}
 }
 
