@@ -7,7 +7,6 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"totmapi/internal/config"
-	"totmapi/internal/models"
 )
 
 type User struct {
@@ -123,67 +122,3 @@ func UpdatePassword(username string, newpassword string) error {
 
 	return nil
 }
-
-func SelectBlogPosts(publishedParam string) ([]models.Blogposts, error) {
-
-	publishedParamConstraint := "WHERE published = true"
-
-	if publishedParam == "all" {
-		publishedParamConstraint = ""
-	}
-
-	if publishedParam == "false" {
-		publishedParamConstraint = "WHERE published = false"
-	}
-
-	connStr := *config.GetDBConfig().ConnectionString
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
-	}
-	defer db.Close()
-
-	rows, err := db.Query(fmt.Sprintf("SELECT * FROM totm.blogposts %s", publishedParamConstraint))
-	if err != nil {
-		return []models.Blogposts{}, fmt.Errorf("query error: %w", err)
-	}
-	defer rows.Close()
-
-	var blogpostid string
-	var title sql.NullString
-	var markdown sql.NullString
-	var category sql.NullString
-	var image sql.NullString
-	var video sql.NullString
-	var date sql.NullTime
-	var published bool
-
-	var posts []models.Blogposts
-
-	for rows.Next() {
-
-		err := rows.Scan(&blogpostid, &title, &markdown, &category, &image, &video, &date, &published)
-		if err != nil {
-			return []models.Blogposts{}, fmt.Errorf("scan error: %w", err)
-		}
-		posts = append(posts, models.Blogposts{BlogpostID: blogpostid, Title: title, Markdown: markdown, Category: category, Image: image, Video: video, Date: date})
-	}
-
-	if err := rows.Err(); err != nil {
-		return []models.Blogposts{}, fmt.Errorf("rows error: %w", err)
-	}
-
-	//sortPostsDescending(posts)
-
-	return posts, nil
-
-}
-
-//func sortPostsDescending(posts []models.Blogposts) {
-//	sort.Slice(posts, func(i, j int) bool {
-//		// Return true if posts[i] should appear before posts[j].
-//		// For newest first, we want the more recent date to come first.
-//		// So compare using Date.After(...).
-//		return posts[i].Date.After(posts[j].Date)
-//	})
-//}

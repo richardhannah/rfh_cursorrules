@@ -17,6 +17,7 @@ type DbContext struct {
 
 func NewDbContext() *DbContext {
 	connStr := *config.GetDBConfig().ConnectionString
+	fmt.Println(connStr)
 	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
@@ -29,7 +30,7 @@ func (d *DbContext) Select(destPtr interface{}) error {
 	if err != nil {
 		return err
 	}
-	q := fmt.Sprintf("SELECT * FROM totm.%s", table)
+	q := fmt.Sprintf("SELECT * FROM %s", table)
 	fmt.Println(q)
 	return d.DB.Select(destPtr, q)
 }

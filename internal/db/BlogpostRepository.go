@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	sq "github.com/Masterminds/squirrel"
 	"log"
 	"totmapi/internal/models"
 )
@@ -18,7 +19,14 @@ func NewBlogPostRepository(ctx IDbContext) *BlogPostRepository {
 func (b BlogPostRepository) SelectAll() []models.Blogposts {
 
 	var posts []models.Blogposts
-	if err := b.dbContext.Select(&posts); err != nil {
+
+	predicate := func(sb sq.SelectBuilder) sq.SelectBuilder {
+		return sb.
+			Where(sq.Eq{"published": true}).
+			OrderBy("date DESC")
+	}
+
+	if err := b.dbContext.SelectPredicate(&posts, predicate); err != nil {
 		log.Println(fmt.Sprintf("Error selecting all blogposts %s", err))
 	}
 	return posts
