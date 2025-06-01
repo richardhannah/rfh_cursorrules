@@ -3,15 +3,12 @@ package di
 import (
 	"log"
 	"reflect"
-	"totmapi/internal/config"
 	"totmapi/internal/db"
 )
 
 var Container map[reflect.Type]interface{}
 
 func InitializeServices() {
-	connStr := "postgres://richard:Onlyone1@localhost:5432/richard?sslmode=disable&search_path=totm"
-	config.SetDBConfig(&connStr)
 
 	RegisterService[db.DbContext](db.NewDbContext())
 	RegisterService[db.BlogPostRepository](db.NewBlogPostRepository(GetService[db.DbContext]()))
