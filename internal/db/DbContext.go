@@ -30,6 +30,7 @@ func (d *DbContext) Select(destPtr interface{}) error {
 		return err
 	}
 	q := fmt.Sprintf("SELECT * FROM %s", table)
+	fmt.Println(q)
 	return d.DB.Select(destPtr, q)
 }
 
