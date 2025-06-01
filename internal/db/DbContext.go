@@ -46,6 +46,7 @@ func (d *DbContext) SelectPredicate(destPtr interface{}, modifier func(sq.Select
 	sb = modifier(sb)
 
 	sqlStr, args, err := sb.ToSql()
+	fmt.Println(sqlStr)
 	if err != nil {
 		return err
 	}
