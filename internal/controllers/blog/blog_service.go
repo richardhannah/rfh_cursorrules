@@ -4,9 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"totmapi/internal/controllers"
 	"totmapi/internal/db"
+	"totmapi/internal/di"
+	"totmapi/internal/dto"
+	"totmapi/internal/models"
 )
 
 func SetRoutes(router *mux.Router) {
@@ -42,17 +46,18 @@ func getSinglePost(id string) {
 }
 
 func listBlogPosts(w http.ResponseWriter, r *http.Request) {
-	queryParams := r.URL.Query()
-	published := queryParams.Get("published")
 
-	blogposts, err := db.SelectBlogPosts(published)
+	blogPostRepository := di.GetService[db.BlogPostRepository]()
+	blogposts, err := dto.ConvertSlice[models.Blogposts, dto.BlogpostDTO](blogPostRepository.SelectAll())
 	if err != nil {
-		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
-		return
+		log.Println("error converting model to dto")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
 	}
 
 	json, err := json.Marshal(blogposts)
 	if err != nil {
+		log.Println("error marshalling Json")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 	}
@@ -60,6 +65,15 @@ func listBlogPosts(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, fmt.Sprintf(string(json)))
 }
 
+//queryParams := r.URL.Query()
+//published := queryParams.Get("published")
+
+// blogposts, err := db.SelectBlogPosts(published)
+//
+//	if err != nil {
+//		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
+//		return
+//	}
 func create(w http.ResponseWriter, r *http.Request) {
 
 }
