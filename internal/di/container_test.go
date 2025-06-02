@@ -37,7 +37,7 @@ func TestBlogPosts(t *testing.T) {
 	InitializeServices()
 
 	returnedService := GetService[db.BlogPostRepository]()
-	result := returnedService.SelectAll()
+	result := returnedService.SelectAllPublished()
 	fmt.Println(result)
 
 }

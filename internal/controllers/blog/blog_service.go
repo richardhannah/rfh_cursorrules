@@ -48,7 +48,7 @@ func getSinglePost(id string) {
 func listBlogPosts(w http.ResponseWriter, r *http.Request) {
 
 	blogPostRepository := di.GetService[db.BlogPostRepository]()
-	blogposts, err := dto.ConvertSlice[models.Blogposts, dto.BlogpostDTO](blogPostRepository.SelectAll())
+	blogposts, err := dto.ConvertSlice[models.Blogposts, dto.BlogpostDTO](blogPostRepository.SelectAllPublished())
 	if err != nil {
 		log.Println("error converting model to dto")
 		w.Header().Set("Content-Type", "application/json")

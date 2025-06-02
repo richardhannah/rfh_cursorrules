@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/google/uuid"
 	"log"
+	"totmapi/internal/dto"
 	"totmapi/internal/models"
 )
 
@@ -16,7 +18,7 @@ func NewBlogPostRepository(ctx IDbContext) *BlogPostRepository {
 	return &BlogPostRepository{dbContext: ctx}
 }
 
-func (b BlogPostRepository) SelectAll() []models.Blogposts {
+func (b BlogPostRepository) SelectAllPublished() []models.Blogposts {
 
 	var posts []models.Blogposts
 
@@ -32,7 +34,34 @@ func (b BlogPostRepository) SelectAll() []models.Blogposts {
 	return posts
 }
 
-func (b BlogPostRepository) Insert() {}
+func (b BlogPostRepository) SelectById(id string) []models.Blogposts {
+	var posts []models.Blogposts
+
+	predicate := func(sb sq.SelectBuilder) sq.SelectBuilder {
+		return sb.
+			Where(sq.Eq{"blogpostid": id})
+	}
+
+	if err := b.dbContext.Select(&posts, predicate); err != nil {
+		log.Println(fmt.Sprintf("Error selecting all blogposts %s", err))
+	}
+	return posts
+}
+
+func (b BlogPostRepository) Insert(blogPost dto.BlogpostDTO) {
+
+	predicate := func(sb sq.InsertBuilder) sq.InsertBuilder {
+		return sb.
+			Columns("blogpostid", "title", "markdown", "category", "image", "video", "date", "published").
+			Values(uuid.New().String(), blogPost.Title, blogPost.Markdown, blogPost.Category, blogPost.Image, blogPost.Video, blogPost.Date, blogPost.Published)
+	}
+
+	b.dbContext.Insert(&[]models.Blogposts{}, predicate)
+}
+
+func (b BlogPostRepository) Update() {}
+func (b BlogPostRepository) Delete() {}
+
 func (b BlogPostRepository) Select(id string) (models.Blogposts, error) {
 
 	sqlquery := fmt.Sprintf("SELECT from blogposts where id = %s", id)
@@ -69,6 +98,3 @@ func (b BlogPostRepository) Select(id string) (models.Blogposts, error) {
 
 	return posts[0], nil
 }
-
-func (b BlogPostRepository) Update() {}
-func (b BlogPostRepository) Delete() {}

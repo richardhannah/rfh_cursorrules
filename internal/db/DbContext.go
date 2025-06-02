@@ -150,11 +150,11 @@ func (d DbContext) Close() {
 func tableName(ptrToSlice interface{}) (string, error) {
 	t := reflect.TypeOf(ptrToSlice)
 	if t.Kind() != reflect.Ptr {
-		return "", fmt.Errorf("SelectAll: expected pointer to slice, got %T", ptrToSlice)
+		return "", fmt.Errorf("SelectAllPublished: expected pointer to slice, got %T", ptrToSlice)
 	}
 	t = t.Elem()
 	if t.Kind() != reflect.Slice {
-		return "", fmt.Errorf("SelectAll: expected pointer to slice, got pointer to %s", t.Kind())
+		return "", fmt.Errorf("SelectAllPublished: expected pointer to slice, got pointer to %s", t.Kind())
 	}
 	elem := t.Elem()
 	// If you want snake_case, you can use a small util here:
