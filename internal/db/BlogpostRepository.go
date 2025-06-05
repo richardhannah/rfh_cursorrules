@@ -59,8 +59,34 @@ func (b BlogPostRepository) Insert(blogPost dto.BlogpostDTO) {
 	b.dbContext.Insert(&[]models.Blogposts{}, predicate)
 }
 
-func (b BlogPostRepository) Update() {}
-func (b BlogPostRepository) Delete() {}
+func (b BlogPostRepository) Update(blogPost dto.BlogpostDTO) {
+
+	predicate := func(ub sq.UpdateBuilder) sq.UpdateBuilder {
+		return ub.
+			Set("title", "updated Title").
+			Where(
+				sq.Eq{"blogpostid": blogPost.BlogpostID},
+			)
+	}
+
+	b.dbContext.Update(&[]models.Blogposts{}, predicate)
+
+}
+
+func (b BlogPostRepository) Delete(blogPost dto.BlogpostDTO) {
+
+	predicate := func(db sq.DeleteBuilder) sq.DeleteBuilder {
+		return db.Where(
+			sq.Eq{"blogpostid": blogPost.BlogpostID},
+		)
+	}
+
+	err := b.dbContext.Delete(&[]models.Blogposts{}, predicate)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
 
 func (b BlogPostRepository) Select(id string) (models.Blogposts, error) {
 

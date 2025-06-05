@@ -51,3 +51,39 @@ func TestInsertBlogPost(t *testing.T) {
 
 	testSubject.Insert(dto)
 }
+
+func TestUpdateBlogPost(t *testing.T) {
+	testSubject := newDbTestRepository(t)
+	nowUTC := time.Now().UTC()
+
+	dto := dto2.BlogpostDTO{
+		BlogpostID: "a78fd4c1-5e30-4230-8bfd-dad27a157791",
+		Title:      "testtitle",
+		Markdown:   "markdown",
+		Category:   "test",
+		Image:      "testimage.jpg",
+		Video:      "testvideo",
+		Date:       &nowUTC,
+		Published:  false,
+	}
+
+	testSubject.Update(dto)
+}
+
+func TestDeleteBlogPost(t *testing.T) {
+	testSubject := newDbTestRepository(t)
+	nowUTC := time.Now().UTC()
+
+	dto := dto2.BlogpostDTO{
+		BlogpostID: "a78fd4c1-5e30-4230-8bfd-dad27a157791",
+		Title:      "testtitle",
+		Markdown:   "markdown",
+		Category:   "test",
+		Image:      "testimage.jpg",
+		Video:      "testvideo",
+		Date:       &nowUTC,
+		Published:  false,
+	}
+
+	testSubject.Delete(dto)
+}
