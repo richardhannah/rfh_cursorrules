@@ -22,7 +22,10 @@ func newTestContext(t *testing.T) *DbContext {
 
 func TestDbConnection(t *testing.T) {
 	testSubject := newTestContext(t)
-	rows := testSubject.QueryDB("SELECT 1")
+	rows, err := testSubject.QueryDB("SELECT 1")
+	if err != nil {
+		assert.Fail(t, "failed to connect to db")
+	}
 	assert.NotNil(t, rows)
 }
 

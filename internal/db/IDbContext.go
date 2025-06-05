@@ -11,6 +11,6 @@ type IDbContext interface {
 	Insert(destPtr interface{}, modifier func(squirrel.InsertBuilder) squirrel.InsertBuilder) error
 	Update(destPtr interface{}, modifier func(squirrel.UpdateBuilder) squirrel.UpdateBuilder) error
 	Delete(destPtr interface{}, modifier func(squirrel.DeleteBuilder) squirrel.DeleteBuilder) error
-	QueryDB(query string) *sql.Rows
-	Close()
+	QueryDB(query string) (*sql.Rows, error)
+	Close() error
 }

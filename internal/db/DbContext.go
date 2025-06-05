@@ -134,17 +134,21 @@ func (d *DbContext) Delete(destPtr interface{}, modifier func(sq.DeleteBuilder) 
 	return nil
 }
 
-func (d DbContext) QueryDB(query string) *sql.Rows {
+func (d DbContext) QueryDB(query string) (*sql.Rows, error) {
 	rows, err := d.DB.Query(query)
 	if err != nil {
 		log.Printf("Failed to query Db")
-		return nil
+		return nil, err
 	}
-	return rows
+	return rows, nil
 }
 
-func (d DbContext) Close() {
-	d.DB.Close()
+func (d DbContext) Close() error {
+	err := d.DB.Close()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func tableName(ptrToSlice interface{}) (string, error) {
