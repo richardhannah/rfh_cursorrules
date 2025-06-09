@@ -11,8 +11,15 @@ import (
 	"totmapi/internal/config"
 )
 
+type ISqlx interface {
+	Select(dest interface{}, query string, args ...interface{}) error
+	Exec(query string, args ...interface{}) (sql.Result, error)
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+	Close() error
+}
+
 type DbContext struct {
-	DB *sqlx.DB
+	DB ISqlx
 }
 
 func NewDbContext() *DbContext {
@@ -54,25 +61,21 @@ func (d *DbContext) Select(destPtr interface{}, modifier func(sq.SelectBuilder) 
 }
 
 func (d *DbContext) Insert(destPtr interface{}, modifier func(sq.InsertBuilder) sq.InsertBuilder) error {
-	// 1) Figure out the table name from destPtr
+
 	table, err := tableName(destPtr)
 	if err != nil {
 		return err
 	}
 
-	// 2) Start an InsertBuilder for that table, using PostgreSQL-style placeholders
 	ib := sq.Insert(table).PlaceholderFormat(sq.Dollar)
 
-	// 3) Let the caller add Columns(...) / Values(...) / Returning(...) etc.
 	ib = modifier(ib)
 
-	// 4) Generate SQL + args
 	sqlStr, args, err := ib.ToSql()
 	if err != nil {
 		return fmt.Errorf("Insert: failed to build SQL: %w", err)
 	}
 
-	// 5) Exec the INSERT
 	_, err = d.DB.Exec(sqlStr, args...)
 	if err != nil {
 		return fmt.Errorf("Insert exec error: %w", err)
@@ -81,25 +84,21 @@ func (d *DbContext) Insert(destPtr interface{}, modifier func(sq.InsertBuilder) 
 }
 
 func (d *DbContext) Update(destPtr interface{}, modifier func(sq.UpdateBuilder) sq.UpdateBuilder) error {
-	// 1) Infer the table name
+
 	table, err := tableName(destPtr)
 	if err != nil {
 		return err
 	}
 
-	// 2) Start an UpdateBuilder for that table
 	ub := sq.Update(table).PlaceholderFormat(sq.Dollar)
 
-	// 3) Let the caller add .Set(...) / .Where(...) / possibly .Suffix(...) or .Returning(...)
 	ub = modifier(ub)
 
-	// 4) Build SQL + args
 	sqlStr, args, err := ub.ToSql()
 	if err != nil {
 		return fmt.Errorf("Update: failed to build SQL: %w", err)
 	}
 
-	// 5) Exec the UPDATE
 	_, err = d.DB.Exec(sqlStr, args...)
 	if err != nil {
 		return fmt.Errorf("Update exec error: %w", err)
@@ -114,19 +113,15 @@ func (d *DbContext) Delete(destPtr interface{}, modifier func(sq.DeleteBuilder) 
 		return err
 	}
 
-	// 2) Start a DeleteBuilder for that table
 	dbb := sq.Delete(table).PlaceholderFormat(sq.Dollar)
 
-	// 3) Let the caller add .Where(...) / .Suffix(...) / .Returning(...)
 	dbb = modifier(dbb)
 
-	// 4) Build SQL + args
 	sqlStr, args, err := dbb.ToSql()
 	if err != nil {
 		return fmt.Errorf("Delete: failed to build SQL: %w", err)
 	}
 
-	// 5) Exec the DELETE
 	_, err = d.DB.Exec(sqlStr, args...)
 	if err != nil {
 		return fmt.Errorf("Delete exec error: %w", err)
@@ -161,7 +156,7 @@ func tableName(ptrToSlice interface{}) (string, error) {
 		return "", fmt.Errorf("SelectAllPublished: expected pointer to slice, got pointer to %s", t.Kind())
 	}
 	elem := t.Elem()
-	// If you want snake_case, you can use a small util here:
+
 	return toSnakeCase(elem.Name()), nil
 }
 
