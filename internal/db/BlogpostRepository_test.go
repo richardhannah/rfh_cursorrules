@@ -2,18 +2,22 @@ package db
 
 import (
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"testing"
 	"time"
-	"totmapi/internal/config"
 	dto2 "totmapi/internal/dto"
 )
 
 func newDbTestRepository(t *testing.T) *BlogPostRepository {
 	connStr := "postgres://richard:Onlyone1@localhost:5432/richard?sslmode=disable&search_path=totm"
-	config.SetDBConfig(&connStr)
+	db, err := sqlx.Connect("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
 
-	ctx := NewDbContext()
+	ctx := NewDbContext(db)
 
 	repository := NewBlogPostRepository(ctx)
 	t.Cleanup(func() { ctx.Close() })

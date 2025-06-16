@@ -1,16 +1,23 @@
 package di
 
 import (
+	"github.com/jmoiron/sqlx"
 	"log"
 	"reflect"
+	"totmapi/internal/config"
 	"totmapi/internal/db"
 )
 
 var Container map[reflect.Type]interface{}
 
 func InitializeServices() {
+	connStr := *config.GetDBConfig().ConnectionString
+	sqlx, err := sqlx.Connect("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
 
-	RegisterService[db.DbContext](db.NewDbContext())
+	RegisterService[db.DbContext](db.NewDbContext(sqlx))
 	RegisterService[db.BlogPostRepository](db.NewBlogPostRepository(GetService[db.DbContext]()))
 }
 

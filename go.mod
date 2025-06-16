@@ -12,6 +12,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/sashabaranov/go-openai v1.36.1
 	github.com/stretchr/testify v1.10.0
+	github.com/zhashkevych/go-sqlxmock v1.5.1
 )
 
 require (

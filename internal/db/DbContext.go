@@ -4,11 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"reflect"
 	"strings"
-	"totmapi/internal/config"
 )
 
 type ISqlx interface {
@@ -22,13 +20,13 @@ type DbContext struct {
 	DB ISqlx
 }
 
-func NewDbContext() *DbContext {
-	connStr := *config.GetDBConfig().ConnectionString
-	db, err := sqlx.Connect("postgres", connStr)
-	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
-	}
-	return &DbContext{DB: db}
+func NewDbContext(iSqlx ISqlx) *DbContext {
+	//connStr := *config.GetDBConfig().ConnectionString
+	//db, err := sqlx.Connect("postgres", connStr)
+	//if err != nil {
+	//	log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	//}
+	return &DbContext{DB: iSqlx}
 }
 
 func (d *DbContext) SelectAll(destPtr interface{}) error {

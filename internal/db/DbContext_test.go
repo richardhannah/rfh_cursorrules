@@ -4,24 +4,46 @@ import (
 	"database/sql"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
+	sqlmock "github.com/zhashkevych/go-sqlxmock"
+	"log"
 	"testing"
 	"time"
-	"totmapi/internal/config"
 	"totmapi/internal/models"
 )
 
 func newTestContext(t *testing.T) *DbContext {
 	connStr := "postgres://richard:Onlyone1@localhost:5432/richard?sslmode=disable&search_path=totm"
-	config.SetDBConfig(&connStr)
+	sqlxDb, err := sqlx.Connect("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
 
-	ctx := NewDbContext()
+	ctx := NewDbContext(sqlxDb)
 	t.Cleanup(func() { ctx.Close() })
 	return ctx
 }
 
+func TestDbConnectionMockedSqlx(t *testing.T) {
+	db, mock, err := sqlmock.Newx()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	testSubject := NewDbContext(db)
+	mock.ExpectQuery("SELECT 1").WillReturnRows(sqlmock.NewRows([]string{"one"}))
+
+	rows, err := testSubject.QueryDB("SELECT 1")
+	if err != nil {
+		assert.Fail(t, "failed to connect to db")
+	}
+	assert.NotNil(t, rows)
+}
+
 func TestDbConnection(t *testing.T) {
 	testSubject := newTestContext(t)
+
 	rows, err := testSubject.QueryDB("SELECT 1")
 	if err != nil {
 		assert.Fail(t, "failed to connect to db")
