@@ -1,9 +1,8 @@
 package db
 
 import (
-	"fmt"
-	"log"
 	"totmapi/internal/dto"
+	"totmapi/internal/logger"
 	"totmapi/internal/models"
 
 	sq "github.com/Masterminds/squirrel"
@@ -25,7 +24,7 @@ func (u UserRepository) SelectAll() []models.Users {
 	}
 
 	if err := u.dbContext.Select(&users, predicate); err != nil {
-		log.Println(fmt.Sprintf("Error selecting all users %s", err))
+		logger.Error("Error selecting all users", err)
 	}
 	return users
 }
@@ -39,7 +38,9 @@ func (u UserRepository) SelectById(id string) []models.Users {
 	}
 
 	if err := u.dbContext.Select(&users, predicate); err != nil {
-		log.Println(fmt.Sprintf("Error selecting user by id %s", err))
+		logger.Error("Error selecting user by id", err,
+			logger.String("user_id", id),
+		)
 	}
 	return users
 }
@@ -53,7 +54,9 @@ func (u UserRepository) SelectByUsername(username string) []models.Users {
 	}
 
 	if err := u.dbContext.Select(&users, predicate); err != nil {
-		log.Println(fmt.Sprintf("Error selecting user by username %s", err))
+		logger.Error("Error selecting user by username", err,
+			logger.String("username", username),
+		)
 	}
 	return users
 }
@@ -94,6 +97,9 @@ func (u UserRepository) Delete(user dto.UserDTO) {
 
 	err := u.dbContext.Delete(&[]models.Users{}, predicate)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("Error deleting user", err,
+			logger.String("user_id", user.ID),
+			logger.String("username", user.Username),
+		)
 	}
 }

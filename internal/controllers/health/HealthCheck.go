@@ -1,79 +1,64 @@
 package health
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/gorilla/mux"
-	"log"
 	"net/http"
-	"totmapi/internal/config"
 	"totmapi/internal/controllers"
+	"totmapi/internal/db"
+	"totmapi/internal/di"
+	"totmapi/internal/logger"
+	"totmapi/internal/models"
+
+	"github.com/gorilla/mux"
+
+	"github.com/jmoiron/sqlx"
 )
 
 func SetRoutes(router *mux.Router) {
-	router.HandleFunc("/hello", Hello)
-	router.HandleFunc("/database", DatabaseHealth)
+	router.HandleFunc("/health", HealthCheck)
 }
 
 func init() {
 	controllers.RegisterRouteSetter(SetRoutes)
 }
 
-func Hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "hello world")
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	// Get the database connection from the container
+	dbContext := di.GetService[db.DbContext]()
+	if dbContext == nil {
+		logger.Fatal("Failed to get database context", &healthError{message: "database context not available"})
+	}
+
+	// Test the database connection
+	db := dbContext.DB.(*sqlx.DB)
+	if err := db.Ping(); err != nil {
+		logger.Fatal("Error pinging database", err)
+	}
+
+	// Test a simple query
+	var person models.Person
+	err := db.Get(&person, "SELECT * FROM person LIMIT 1")
+	if err != nil {
+		logger.Fatal("Error querying 'person' table", err)
+	}
+
+	// Log the result for debugging
+	logger.Info("Health check completed successfully",
+		logger.Int("person_id", person.ID),
+		logger.String("person_name", person.Name),
+	)
+
+	// Return a simple JSON response
+	response := fmt.Sprintf(`{"status": "healthy", "database": "connected", "person_id": %d, "person_name": "%s"}`, person.ID, person.Name)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(response))
 }
 
-func DatabaseHealth(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "checking db health")
-
-	connStr := *config.GetDBConfig().ConnectionString
-
-	// Open a connection to the database
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
-	}
-	defer db.Close()
-
-	// Test the connection
-	err = db.Ping()
-	if err != nil {
-		log.Fatalf("Error pinging database: %v", err)
-	}
-
-	// Call the function to query the 'person' table
-	err = getAllPersons(db)
-	if err != nil {
-		log.Fatalf("Error querying 'person' table: %v", err)
-	}
+// healthError implements the error interface
+type healthError struct {
+	message string
 }
 
-// getAllPersons queries the 'person' table and prints the results.
-// Adjust the code to match your actual schema (column names/types).
-func getAllPersons(db *sql.DB) error {
-	rows, err := db.Query("SELECT * FROM totm.person")
-	if err != nil {
-		return fmt.Errorf("query error: %w", err)
-	}
-	defer rows.Close()
-
-	// Example: Suppose 'person' has columns: id (int), name (text)
-	// Adjust the scanning to match your actual columns.
-	for rows.Next() {
-		var id int
-		var name string
-
-		err := rows.Scan(&id, &name)
-		if err != nil {
-			return fmt.Errorf("scan error: %w", err)
-		}
-
-		fmt.Printf("ID: %d, Name: %s\n", id, name)
-	}
-
-	if err := rows.Err(); err != nil {
-		return fmt.Errorf("rows error: %w", err)
-	}
-
-	return nil
+func (e *healthError) Error() string {
+	return e.message
 }

@@ -3,9 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"reflect"
 	"strings"
+	"totmapi/internal/logger"
 
 	sq "github.com/Masterminds/squirrel"
 	_ "github.com/lib/pq"
@@ -23,11 +23,6 @@ type DbContext struct {
 }
 
 func NewDbContext(iSqlx ISqlx) *DbContext {
-	//connStr := *config.GetDBConfig().ConnectionString
-	//db, err := sqlx.Connect("postgres", connStr)
-	//if err != nil {
-	//	log.Fatalf("Failed to connect to PostgreSQL: %v", err)
-	//}
 	return &DbContext{DB: iSqlx}
 }
 
@@ -37,7 +32,7 @@ func (d *DbContext) SelectAll(destPtr interface{}) error {
 		return err
 	}
 	q := fmt.Sprintf("SELECT * FROM %s", table)
-	fmt.Println(q)
+	logger.Debug("Executing SelectAll query", logger.String("query", q))
 	return d.DB.Select(destPtr, q)
 }
 
@@ -53,7 +48,7 @@ func (d *DbContext) Select(destPtr interface{}, modifier func(sq.SelectBuilder) 
 	sb = modifier(sb)
 
 	sqlStr, args, err := sb.ToSql()
-	fmt.Println(sqlStr)
+	logger.Debug("Executing Select query", logger.String("query", sqlStr))
 	if err != nil {
 		return err
 	}
@@ -132,7 +127,7 @@ func (d *DbContext) Delete(destPtr interface{}, modifier func(sq.DeleteBuilder) 
 func (d DbContext) QueryDB(query string) (*sql.Rows, error) {
 	rows, err := d.DB.Query(query)
 	if err != nil {
-		log.Printf("Failed to query Db")
+		logger.Error("Failed to query database", err, logger.String("query", query))
 		return nil, err
 	}
 	return rows, nil

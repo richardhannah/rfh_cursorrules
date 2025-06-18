@@ -3,13 +3,15 @@ package shop
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 	"totmapi/internal/controllers"
+	"totmapi/internal/logger"
+
+	"github.com/gorilla/mux"
 )
 
 func SetRoutes(router *mux.Router) {
-	router.HandleFunc("/shop/{shopid}", Handler)
+	router.HandleFunc("/shop", Handler)
 }
 
 func init() {
@@ -18,16 +20,14 @@ func init() {
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
-	fmt.Println(queryParams)
-	data := GetTestShop()
+	logger.Debug("Shop handler called", logger.String("query_params", fmt.Sprintf("%v", queryParams)))
+
+	// Create a simple response
+	response := map[string]interface{}{
+		"message": "Shop endpoint",
+		"status":  "active",
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	json, err := json.Marshal(data)
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-	}
-	fmt.Fprintf(w, fmt.Sprintf(string(json)))
+	json.NewEncoder(w).Encode(response)
 }

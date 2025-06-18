@@ -2,7 +2,7 @@ package shop
 
 type ShopData struct {
 	Name  string     `json:"name"`
-	Items []ShopItem `json:"items""`
+	Items []ShopItem `json:"items"`
 }
 
 type ShopItem struct {

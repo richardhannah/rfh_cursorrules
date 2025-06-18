@@ -1,9 +1,8 @@
 package db
 
 import (
-	"fmt"
-	"log"
 	"totmapi/internal/dto"
+	"totmapi/internal/logger"
 	"totmapi/internal/models"
 
 	sq "github.com/Masterminds/squirrel"
@@ -29,7 +28,7 @@ func (b BlogPostRepository) SelectAllPublished() []models.Blogposts {
 	}
 
 	if err := b.dbContext.Select(&posts, predicate); err != nil {
-		log.Println(fmt.Sprintf("Error selecting all blogposts %s", err))
+		logger.Error("Error selecting all published blogposts", err)
 	}
 	return posts
 }
@@ -43,7 +42,9 @@ func (b BlogPostRepository) SelectById(id string) []models.Blogposts {
 	}
 
 	if err := b.dbContext.Select(&posts, predicate); err != nil {
-		log.Println(fmt.Sprintf("Error selecting all blogposts %s", err))
+		logger.Error("Error selecting blogpost by id", err,
+			logger.String("blogpost_id", id),
+		)
 	}
 	return posts
 }
@@ -83,7 +84,9 @@ func (b BlogPostRepository) Delete(blogPost dto.BlogpostDTO) {
 
 	err := b.dbContext.Delete(&[]models.Blogposts{}, predicate)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("Error deleting blogpost", err,
+			logger.String("blogpost_id", blogPost.BlogpostID),
+		)
 	}
 
 }

@@ -1,10 +1,10 @@
 package di
 
 import (
-	"log"
 	"reflect"
 	"totmapi/internal/config"
 	"totmapi/internal/db"
+	"totmapi/internal/logger"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -15,7 +15,9 @@ func InitializeServices() {
 	connStr := *config.GetDBConfig().ConnectionString
 	sqlx, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+		logger.Fatal("Failed to connect to PostgreSQL", err,
+			logger.String("connection_string", connStr),
+		)
 	}
 
 	RegisterService[db.DbContext](db.NewDbContext(sqlx))
@@ -33,17 +35,31 @@ func RegisterService[T any](service *T) {
 
 func GetService[T any]() *T {
 	if Container == nil {
-		log.Fatal("container not initialized")
+		logger.Fatal("Container not initialized", &containerError{message: "container not initialized"})
 	}
 	key := reflect.TypeOf((*T)(nil)).Elem()
 	entry, ok := Container[key]
 	if !ok {
-		log.Fatalf("no service registered for type %v", key)
+		logger.Fatal("No service registered for type", &containerError{message: "no service registered for type " + key.String()},
+			logger.String("type", key.String()),
+		)
 	}
 
 	svcPtr, ok := entry.(*T)
 	if !ok {
-		log.Fatalf("registered value for %v is %T, not %T", key, entry, new(T))
+		logger.Fatal("Registered value has wrong type", &containerError{message: "registered value for " + key.String() + " has wrong type"},
+			logger.String("expected_type", key.String()),
+			logger.String("actual_type", reflect.TypeOf(entry).String()),
+		)
 	}
 	return svcPtr
+}
+
+// containerError implements the error interface
+type containerError struct {
+	message string
+}
+
+func (e *containerError) Error() string {
+	return e.message
 }
