@@ -26,20 +26,26 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	// Get the database connection from the container
 	dbContext := di.GetService[db.DbContext]()
 	if dbContext == nil {
-		logger.Fatal("Failed to get database context", &healthError{message: "database context not available"})
+		logger.Error("Failed to get database context", &healthError{message: "database context not available"})
+		http.Error(w, "Database context not available", http.StatusInternalServerError)
+		return
 	}
 
 	// Test the database connection
 	db := dbContext.DB.(*sqlx.DB)
 	if err := db.Ping(); err != nil {
-		logger.Fatal("Error pinging database", err)
+		logger.Error("Error pinging database", err)
+		http.Error(w, "Database connection failed", http.StatusServiceUnavailable)
+		return
 	}
 
 	// Test a simple query
 	var person models.Person
 	err := db.Get(&person, "SELECT * FROM person LIMIT 1")
 	if err != nil {
-		logger.Fatal("Error querying 'person' table", err)
+		logger.Error("Error querying 'person' table", err)
+		http.Error(w, "Database query failed", http.StatusServiceUnavailable)
+		return
 	}
 
 	// Log the result for debugging

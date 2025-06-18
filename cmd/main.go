@@ -56,9 +56,10 @@ func main() {
 	)
 
 	if err := http.ListenAndServe(":5150", handlerSanitize); err != nil {
-		logger.Fatal("Failed to start server", err,
+		logger.Error("Failed to start server", err,
 			logger.String("port", "5150"),
 		)
+		os.Exit(1)
 	}
 }
 

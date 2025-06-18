@@ -35,22 +35,17 @@ func RegisterService[T any](service *T) {
 
 func GetService[T any]() *T {
 	if Container == nil {
-		logger.Fatal("Container not initialized", &containerError{message: "container not initialized"})
+		panic("Container not initialized")
 	}
 	key := reflect.TypeOf((*T)(nil)).Elem()
 	entry, ok := Container[key]
 	if !ok {
-		logger.Fatal("No service registered for type", &containerError{message: "no service registered for type " + key.String()},
-			logger.String("type", key.String()),
-		)
+		panic("No service registered for type " + key.String())
 	}
 
 	svcPtr, ok := entry.(*T)
 	if !ok {
-		logger.Fatal("Registered value has wrong type", &containerError{message: "registered value for " + key.String() + " has wrong type"},
-			logger.String("expected_type", key.String()),
-			logger.String("actual_type", reflect.TypeOf(entry).String()),
-		)
+		panic("Registered value for " + key.String() + " has wrong type")
 	}
 	return svcPtr
 }
