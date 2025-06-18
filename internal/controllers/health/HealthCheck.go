@@ -7,10 +7,8 @@ import (
 	"totmapi/internal/db"
 	"totmapi/internal/di"
 	"totmapi/internal/logger"
-	"totmapi/internal/models"
 
 	"github.com/gorilla/mux"
-
 	"github.com/jmoiron/sqlx"
 )
 
@@ -40,22 +38,21 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Test a simple query
-	var person models.Person
-	err := db.Get(&person, "SELECT * FROM person LIMIT 1")
+	var result int
+	err := db.Get(&result, "SELECT 1")
 	if err != nil {
-		logger.Error("Error querying 'person' table", err)
+		logger.Error("Error executing simple database query", err)
 		http.Error(w, "Database query failed", http.StatusServiceUnavailable)
 		return
 	}
 
 	// Log the result for debugging
 	logger.Info("Health check completed successfully",
-		logger.Int("person_id", person.ID),
-		logger.String("person_name", person.Name),
+		logger.Int("query_result", result),
 	)
 
 	// Return a simple JSON response
-	response := fmt.Sprintf(`{"status": "healthy", "database": "connected", "person_id": %d, "person_name": "%s"}`, person.ID, person.Name)
+	response := fmt.Sprintf(`{"status": "healthy", "database": "connected", "query_result": %d}`, result)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(response))
 }
