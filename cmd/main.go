@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
+	"fmt"
 	"net/http"
 	"os"
 	"totmapi/internal/config"
@@ -13,11 +13,14 @@ import (
 	_ "totmapi/internal/controllers/shop"
 	"totmapi/internal/di"
 	"totmapi/internal/middleware"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
-
+	fmt.Println("Starting TOTM API")
 	connectionString := os.Getenv("TOTM_CONN_STRING")
+
 	config.SetDBConfig(&connectionString)
 
 	di.InitializeServices()

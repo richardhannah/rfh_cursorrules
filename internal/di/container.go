@@ -1,11 +1,12 @@
 package di
 
 import (
-	"github.com/jmoiron/sqlx"
 	"log"
 	"reflect"
 	"totmapi/internal/config"
 	"totmapi/internal/db"
+
+	"github.com/jmoiron/sqlx"
 )
 
 var Container map[reflect.Type]interface{}
@@ -19,6 +20,7 @@ func InitializeServices() {
 
 	RegisterService[db.DbContext](db.NewDbContext(sqlx))
 	RegisterService[db.BlogPostRepository](db.NewBlogPostRepository(GetService[db.DbContext]()))
+	RegisterService[db.UserRepository](db.NewUserRepository(GetService[db.DbContext]()))
 }
 
 func RegisterService[T any](service *T) {
