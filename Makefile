@@ -1,4 +1,4 @@
-.PHONY: test test-integration all check-test-tags
+.PHONY: test test-integration all check-test-tags run
 
 # Use PowerShell for all recipe lines
 SHELL := powershell.exe
@@ -6,6 +6,10 @@ SHELL := powershell.exe
 
 # List all packages in the module
 PKGS := $(shell go list ./...)
+
+# Run the application
+run:
+	go run ./cmd/main.go
 
 # Run all unit tests (default build, no special tags)
 test:

@@ -3,10 +3,12 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	sq "github.com/Masterminds/squirrel"
 	"log"
 	"reflect"
 	"strings"
+
+	sq "github.com/Masterminds/squirrel"
+	_ "github.com/lib/pq"
 )
 
 type ISqlx interface {
