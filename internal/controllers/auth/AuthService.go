@@ -11,6 +11,7 @@ import (
 	"totmapi/internal/db"
 	"totmapi/internal/di"
 	"totmapi/internal/dto"
+	"totmapi/internal/logger"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -32,6 +33,11 @@ func init() {
 func LoginJwt(w http.ResponseWriter, r *http.Request) {
 	// Ensure this is a POST request
 	if r.Method != http.MethodPost {
+		logger.Warn("Invalid method for login endpoint",
+			logger.String("method", r.Method),
+			logger.String("endpoint", "/login"),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -39,6 +45,10 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 	// Parse the JSON body
 	var reqData LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		logger.Error("Failed to decode login request", err,
+			logger.String("endpoint", "/login"),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -49,6 +59,10 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 	// Find user by username
 	users := userRepo.SelectByUsername(reqData.Username)
 	if len(users) == 0 {
+		logger.Warn("Login attempt with non-existent username",
+			logger.String("username", reqData.Username),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "User not found", http.StatusUnauthorized)
 		return
 	}
@@ -57,6 +71,10 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 
 	// Check if user is enabled
 	if !user.Enabled.Bool {
+		logger.Warn("Login attempt for disabled user",
+			logger.String("username", reqData.Username),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "User account is disabled", http.StatusUnauthorized)
 		return
 	}
@@ -66,9 +84,18 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 	if user.Password == inputPass {
 		token, err := generateToken(reqData.Username)
 		if err != nil {
+			logger.Error("Failed to generate JWT token", err,
+				logger.String("username", reqData.Username),
+			)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusUnauthorized)
 		} else {
+			logger.Info("User logged in successfully",
+				logger.String("username", reqData.Username),
+				logger.String("role", user.Role.String),
+				logger.String("remote_addr", r.RemoteAddr),
+			)
+
 			// Write a response
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
@@ -81,6 +108,9 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 
 			json, err := json.Marshal(authresponse)
 			if err != nil {
+				logger.Error("Failed to marshal auth response", err,
+					logger.String("username", reqData.Username),
+				)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusBadRequest)
 			}
@@ -89,6 +119,10 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
+		logger.Warn("Failed login attempt - invalid password",
+			logger.String("username", reqData.Username),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 	}
@@ -98,6 +132,11 @@ func LoginJwt(w http.ResponseWriter, r *http.Request) {
 func Register(w http.ResponseWriter, r *http.Request) {
 	// Ensure this is a POST request
 	if r.Method != http.MethodPost {
+		logger.Warn("Invalid method for register endpoint",
+			logger.String("method", r.Method),
+			logger.String("endpoint", "/register"),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -105,6 +144,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// Parse the JSON body
 	var reqData RegistrationRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		logger.Error("Failed to decode registration request", err,
+			logger.String("endpoint", "/register"),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -115,6 +158,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// Check if user already exists
 	existingUsers := userRepo.SelectByUsername(reqData.Username)
 	if len(existingUsers) > 0 {
+		logger.Warn("Registration attempt with existing username",
+			logger.String("username", reqData.Username),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "Username already exists", http.StatusBadRequest)
 		return
 	}
@@ -138,6 +185,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	userRepo.Insert(newUser)
 
+	logger.Info("User registered successfully",
+		logger.String("username", reqData.Username),
+		logger.String("user_id", newUser.ID),
+		logger.String("remote_addr", r.RemoteAddr),
+	)
+
 	// Write a response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -150,6 +203,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	json, err := json.Marshal(authresponse)
 	if err != nil {
+		logger.Error("Failed to marshal registration response", err,
+			logger.String("username", reqData.Username),
+		)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 	}
@@ -160,6 +216,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 func Changepass(w http.ResponseWriter, r *http.Request) {
 	// Ensure this is a POST request
 	if r.Method != http.MethodPost {
+		logger.Warn("Invalid method for changepass endpoint",
+			logger.String("method", r.Method),
+			logger.String("endpoint", "/changepass"),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -167,6 +228,10 @@ func Changepass(w http.ResponseWriter, r *http.Request) {
 	// Parse the JSON body
 	var reqData ChangePassRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		logger.Error("Failed to decode changepass request", err,
+			logger.String("endpoint", "/changepass"),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "Bad request: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -177,6 +242,10 @@ func Changepass(w http.ResponseWriter, r *http.Request) {
 	// Find user by username
 	users := userRepo.SelectByUsername(reqData.Username)
 	if len(users) == 0 {
+		logger.Warn("Changepass attempt with non-existent username",
+			logger.String("username", reqData.Username),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		http.Error(w, "User not found", http.StatusUnauthorized)
 		return
 	}
@@ -199,9 +268,18 @@ func Changepass(w http.ResponseWriter, r *http.Request) {
 
 		userRepo.Update(updatedUser)
 
+		logger.Info("User password changed successfully",
+			logger.String("username", reqData.Username),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	} else {
+		logger.Warn("Failed changepass attempt - invalid old password",
+			logger.String("username", reqData.Username),
+			logger.String("remote_addr", r.RemoteAddr),
+		)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 	}
