@@ -18,6 +18,67 @@
 - Command: `git subtree pull --prefix=.cursorrules-shared git@github.com:richardhannah/rfh_cursorrules.git main --squash`
 - Do this before starting new features to ensure you have the latest rules
 
+## Documentation Organization and Maintenance
+
+### Documentation Structure
+- **`README.md`** - Project introduction and documentation index
+- **`docs/`** - Main documentation directory
+  - **`API.md`** - Complete API reference with endpoints, examples, error codes
+  - **`ARCHITECTURE.md`** - System design, patterns, and architectural decisions
+  - **`DEVELOPMENT.md`** - Setup, workflow, and development practices
+  - **`TESTING.md`** - Comprehensive testing strategy and examples
+  - **`decisions/`** - Design decision documentation
+    - **`[DECISION_NAME].md`** - Individual decision records
+
+### Documentation Update Rule
+- **Whenever code changes are made** - update relevant documentation
+- **API changes** require updates to `docs/API.md`
+- **Architecture changes** require updates to `docs/ARCHITECTURE.md`
+- **New features** require updates to `docs/DEVELOPMENT.md`
+- **Testing changes** require updates to `docs/TESTING.md`
+- **README.md** should be updated for any user-facing changes
+
+### Major Changes Documentation Rule
+- **Any major changes must be recorded in `docs/decisions/`**
+- **Major changes include**:
+  - Significant architecture changes
+  - Breaking API changes
+  - New design patterns or frameworks
+  - Database schema changes
+  - Security model changes
+  - Performance optimization strategies
+
+### Decision Documentation Format
+```markdown
+# [Decision Name]
+
+## Context
+Brief description of the problem or opportunity
+
+## Decision
+What was decided and why
+
+## Consequences
+- Positive consequences
+- Negative consequences
+- Trade-offs considered
+
+## Implementation
+How the decision was implemented
+
+## Related
+Links to related decisions or documentation
+```
+
+### Documentation Quality Standards
+- **Keep documentation up-to-date** with code changes
+- **Use clear, concise language** - avoid jargon when possible
+- **Include practical examples** for all concepts
+- **Cross-reference related documentation** where appropriate
+- **Use consistent formatting** and structure
+- **Include code examples** where relevant
+- **Maintain version compatibility** information
+
 ## Automatic Testing and Committing
 
 ### Inactivity-Based Auto-Commit Rule
