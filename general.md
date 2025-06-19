@@ -18,6 +18,32 @@
 - Command: `git subtree pull --prefix=.cursorrules-shared git@github.com:richardhannah/rfh_cursorrules.git main --squash`
 - Do this before starting new features to ensure you have the latest rules
 
+## Automatic Testing and Committing
+
+### Inactivity-Based Auto-Commit Rule
+- **After 5 minutes of IDE inactivity** - automatically run unit tests
+- **If all tests pass** - commit any pending changes with descriptive message
+- **If tests fail** - do not commit, alert user to fix issues first
+- This ensures code is regularly saved and tested without manual intervention
+
+### Auto-Commit Workflow
+1. Monitor IDE activity for 5-minute periods of inactivity
+2. Run `go test ./...` to execute all unit tests
+3. If tests pass:
+   - Stage all changes: `git add .`
+   - Commit with timestamp: `git commit -m "Auto-commit: [timestamp] - All tests passing"`
+   - Optionally push if configured for auto-push
+4. If tests fail:
+   - Log the failure details
+   - Alert user to review and fix failing tests
+   - Do not commit changes
+
+### Configuration
+- Enable/disable auto-commit feature via project settings
+- Configure test timeout and retry logic
+- Set up notifications for test failures
+- Customize commit message format
+
 ## Repository Management
 
 ### Git Subtree Best Practices
