@@ -3,9 +3,10 @@ package middleware
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 	"strings"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // Key type for storing token claims in context
@@ -24,19 +25,24 @@ const (
 func JwtAuthMiddleware(next http.Handler, x map[string]string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		// If path is /login, skip JWT validation
-		if r.URL.Path == "/login" {
-			next.ServeHTTP(w, r)
-			return
+		// Public endpoints that don't require JWT validation
+		publicPaths := []string{
+			"/login",
+			"/register",
+			"/health",
+			"/shop",
 		}
 
-		// If path is /login, skip JWT validation
-		if r.URL.Path == "/register" {
-			next.ServeHTTP(w, r)
-			return
+		// Check if the current path is public
+		for _, path := range publicPaths {
+			if r.URL.Path == path {
+				next.ServeHTTP(w, r)
+				return
+			}
 		}
 
-		if r.URL.Path == "/blogposts" {
+		// GET /blogposts is public (read-only)
+		if r.URL.Path == "/blogposts" && r.Method == http.MethodGet {
 			next.ServeHTTP(w, r)
 			return
 		}

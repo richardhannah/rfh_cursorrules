@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # TOTM API Service (for testing)
+  totm-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: totm-api-test
+    ports:
+      - "5150:5150"
+    environment:
+      - TOTM_CONN_STRING=postgres://totm_user:totm_password@postgres:5432/totm_test?sslmode=disable
+    networks:
+      - totm-network
+    depends_on:
+      - postgres
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: totm-postgres-test
+    environment:
+      - POSTGRES_DB=totm_test
+      - POSTGRES_USER=totm_user
+      - POSTGRES_PASSWORD=totm_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - totm-network
+
+networks:
+  totm-network:
+    driver: bridge
+
+volumes:
+  postgres_data: 

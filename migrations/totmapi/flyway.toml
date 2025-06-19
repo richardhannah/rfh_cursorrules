@@ -23,8 +23,8 @@ filterFile = "filter.rgf"
 ignoreNewlinesInTextObjects = "off"
 
 [environments.totm-local]
-url = "jdbc:postgresql://localhost:5432/"
-schemas = [ "richard" ]
+url = "jdbc:postgresql://localhost:5432/richard"
+schemas = [ "totm" ]
 displayName = "totm-local"
 
 [environments.totm-prod]
