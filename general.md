@@ -135,3 +135,9 @@ Links to related decisions or documentation
 - `.cursorrules-shared/` must be tracked for git subtree to push/pull changes
 - Ignoring either file will break the shared rules workflow
 - These files are part of your project's documentation and should be version controlled 
+
+## Build and Test Automation
+
+### Makefile Test Target
+- All projects that use `make` MUST have a `test` target that runs all available tests (unit, integration, etc).
+- The `test` target should be the default target when running `make` with no arguments.
