@@ -1,0 +1,43 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Go Architecture Rules
+
+## Clean Architecture
+- Separate concerns: controllers, services, repositories
+- Use dependency injection for all dependencies
+- Interface-based design for testability
+
+## Repository Pattern
+- All database operations go through repository interfaces
+- Repositories are defined in `internal/db/` with interfaces in `IDbContext.go`
+- Controllers use repositories, never direct database access
+- Follow the pattern: `UserRepository`, `BlogpostRepository`, etc.
+
+## Dependency Injection
+- Use the DI container in `internal/di/container.go`
+- Register all dependencies in the container
+- Controllers receive dependencies through constructor injection
+
+## Package Structure
+- `cmd/` - Application entry point
+- `internal/` - Private application code
+- `internal/controllers/` - HTTP handlers and business logic
+- `internal/db/` - Database layer and repositories
+- `internal/models/` - Database models
+- `internal/dto/` - Data transfer objects
+- `internal/middleware/` - HTTP middleware
+- `internal/config/` - Configuration management
+- `internal/logger/` - Logging utilities
+- `internal/di/` - Dependency injection
+- `migrations/` - Database migrations (Flyway)
+
+## Naming Conventions
+- Use PascalCase for exported types and functions
+- Use camelCase for variables and unexported functions
+- Repository interfaces: `IUserRepository`, `IBlogpostRepository`
+- Repository implementations: `UserRepository`, `BlogpostRepository`
+- Controllers: `AuthController`, `BlogController`, `ShopController`
+- Services: `AuthService`, `BlogService`

@@ -1,0 +1,18 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Go Development Rules
+
+## Error Handling
+- Always check and handle errors
+- Use structured logging for error reporting
+- Return appropriate HTTP status codes
+- Include error context in logs
+
+## Code Quality
+- Follow Go idioms and best practices
+- Use `go fmt` for code formatting
+- Write clear, descriptive comments
+- Keep functions focused and single-purpose
