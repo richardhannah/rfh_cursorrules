@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+description: "Parameterized queries, authentication, authorization, input sanitization, and HTTPS"
 alwaysApply: false
 ---
 # Go Security Rules

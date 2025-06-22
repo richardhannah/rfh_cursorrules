@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+description: "Test organization, patterns, build tags, mocks, and table-driven tests"
 alwaysApply: false
 ---
 # Go Testing Rules

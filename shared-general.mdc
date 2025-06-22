@@ -1,6 +1,5 @@
 ---
-description: 
-globs: 
+description: "Repository management, shared rules maintenance, git subtree best practices, and documentation standards"
 alwaysApply: false
 ---
 # General Repository Management Rules
@@ -140,5 +139,3 @@ Links to related decisions or documentation
 - `.cursor/rules/agent-requested/` must be tracked for git subtree to push/pull changes
 - Ignoring either directory will break the shared rules workflow
 - These files are part of your project's documentation and should be version controlled
-
-

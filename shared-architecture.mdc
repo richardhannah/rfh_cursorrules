@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+description: "Clean architecture, repository pattern, dependency injection, and package structure guidelines"
 alwaysApply: false
 ---
 # Go Architecture Rules

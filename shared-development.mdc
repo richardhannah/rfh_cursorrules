@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+description: "Error handling, code quality, logging, comments, and function focus"
 alwaysApply: false
 ---
 # Go Development Rules

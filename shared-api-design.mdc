@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+description: "REST conventions, DTOs, error handling, and middleware patterns"
 alwaysApply: false
 ---
 # Go API Design Rules

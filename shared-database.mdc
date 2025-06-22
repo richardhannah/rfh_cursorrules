@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+description: "Database operations, model struct tags, validation, and security practices"
 alwaysApply: false
 ---
 # Go Database Rules
