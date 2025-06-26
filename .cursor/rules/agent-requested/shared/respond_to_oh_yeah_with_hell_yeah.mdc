@@ -1,0 +1,8 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Respond to 'oh yeah?' with 'Hell yeah!'
+
+Whenever the user says 'oh yeah?' in chat, respond with 'Hell yeah!'.

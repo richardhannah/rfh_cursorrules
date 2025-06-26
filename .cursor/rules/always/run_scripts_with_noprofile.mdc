@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Run Scripts with -NoProfile Argument
+
+Whenever the agent executes a script (e.g., PowerShell), it should be run with the `-NoProfile` argument to avoid loading user profiles and ensure a clean environment.
+

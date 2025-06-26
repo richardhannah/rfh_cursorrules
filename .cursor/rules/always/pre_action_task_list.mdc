@@ -1,0 +1,15 @@
+---
+description: Before modifying files, pause to create a task list in .cursor/tasks and do not proceed until it is written. Mark tasks as completed as each is finished. If missed, retroactively generate the task list.
+globs: 
+alwaysApply: true
+---
+
+# Pre-Action Task List Rule
+
+Before beginning any action that will modify files in the repository (creating, editing, or deleting):
+1. **Pause and generate a task list** detailing the actions that will be taken.
+2. **Do not proceed** with file modifications until this task list is written to the `.cursor/tasks` folder.
+3. As each task is completed, mark the corresponding task in the task list as completed.
+4. If the agent fails to generate a task list before acting, it must retroactively create and complete the task list for those actions as soon as the oversight is noticed.
+
+

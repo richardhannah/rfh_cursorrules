@@ -1,0 +1,11 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Refine Rule on Violation
+
+Whenever the user asks the AI to explain why the agent did not follow a rule:
+1. The agent must examine the relevant rule.
+2. The agent must refine or clarify the rule as needed to ensure it will be followed in the future.
+3. The agent should document the refinement in an action report for traceability.

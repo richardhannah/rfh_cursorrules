@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+## File Editing Policy
+
+
+**CRITICAL**
+
+Whenever a course of action will involve using the `edit_file` or `delete_file` tools
+
+
+Ensure that a task list exists in the .cursor/tasks folder as per the @pre_action_task_list.mdc rule. If not then PAUSE and do this NOW.

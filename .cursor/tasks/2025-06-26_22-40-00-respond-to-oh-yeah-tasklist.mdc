@@ -1,0 +1,9 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+Task List: Create 'respond_to_oh_yeah_with_hell_yeah.mdc' (2025-06-26 22:40:00)
+
+1. Create a new agent-requested rule file named 'respond_to_oh_yeah_with_hell_yeah.mdc' in '.cursor/rules/agent-requested/shared/'. [COMPLETED]
+   - Content: Whenever the user says 'oh yeah?' in chat, respond with 'Hell yeah!'.

@@ -1,0 +1,16 @@
+---
+description: Place new project rules in the project subfolder and create the directory if it does not exist
+globs: 
+alwaysApply: true
+---
+
+# Add Project Rule to Project Subfolder
+
+Whenever the developer requests you to add a project rule:
+1. Place the rule in the appropriate `project` subfolder (e.g., `.cursor/rules/always/project`).
+2. If the `project` directory does not exist, create it before adding the rule.
+
+## Example
+If the user says "add a project rule - whenever I say ham in chat - reply with the phrase green eggs" then the rule should be created in `.cursor/rules/always/project`.
+
+

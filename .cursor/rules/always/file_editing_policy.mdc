@@ -1,0 +1,27 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# File Editing Policy
+
+**CRITICAL**
+
+Whenever a course of action will involve using the `edit_file` or `delete_file` tools:
+
+1. **Pause and generate a task list** detailing every file operation (creation, edit, or deletion) that will be performed. This task list must be specific and actionable.
+2. **Write the task list to the `.cursor/tasks` folder** before taking any file action. The filename must be timestamped, descriptive of the operation, and use the `.mdc` extension.
+3. **Do not proceed** with any file creation, modification, or deletion until the task list is written and saved in `.cursor/tasks`.
+4. **Before any file operation, the agent must perform an automated check for an existing, up-to-date task list** for the intended actions. If the task list is missing or incomplete, the operation must be aborted and the required task list generated. The agent must log an explicit warning or error if this check fails.
+5. **The agent must not proceed under any circumstances if the task list is missing or incomplete, except in the case of a user-requested exception, which must be explicitly confirmed and documented in the action report.**
+6. **As each task is completed,** immediately mark the corresponding task in the task list as completed (e.g., by appending "[COMPLETED]" or similar notation).
+7. **If the agent fails to generate a task list before acting,** it must retroactively create and complete the task list for those actions as soon as the oversight is noticed, and report this in the next action report. **Any retroactive task list creation must be accompanied by a detailed action report explaining the oversight and the corrective steps taken. Retroactive task lists are only a last resort and not a substitute for proactive compliance.**
+8. **The task list must include:**
+   - The exact files to be created, edited, or deleted
+   - A brief description of the intended change for each file
+   - The order in which the actions will be performed
+9. **All files in the `.cursor` directory (except scripts) must have the `.mdc` extension.** This includes all rules, task lists, and reports. Scripts are the only exception and may use `.ps1` or other appropriate script extensions.
+10. **Reference the @file_editing_policy.mdc rule in all file operation code paths and action reports,** to reinforce compliance and traceability.
+
+This policy is of vital importance for repository integrity, traceability, and compliance with project rules. No file operation should ever occur without a corresponding, up-to-date task list in `.cursor/tasks` with the `.mdc` extension.
+

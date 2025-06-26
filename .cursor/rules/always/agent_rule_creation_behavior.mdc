@@ -1,0 +1,77 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Agent Rule Creation Behavior
+
+When the user says "add a rule", the agent must:
+
+1.  Create a new rule file within the `.cursor/rules/` directory structure. The content should be a clear, well-formatted markdown document.
+2.  If the appropriate category (`always`, `auto-attached`, `agent-requested`) or file path is not obvious from the context, the agent must ask the user for clarification on where to place the rule.
+3.  The agent should not *only* create a memory when a rule is requested; it must create a persistent rule file. A memory can be created in addition to the rule if the information is also a general preference.
+
+# Yaml frontmatter
+
+The agent should ensure that appropriate yaml frontmatter is prepended to the rule depending on the folder or subfolder the rule is to be created in.
+
+## Always rules
+
+all rules under `.cursor\rules\always'
+
+these rules are intended to be followed at ALL times.
+
+example yaml frontmatter
+
+---
+description: {a short description of the rule}
+globs:
+alwaysApply: true
+---
+
+## Auto-attached rules
+
+These rules are to be run when files matching a glob pattern are referenced.
+
+For instance when working with python files
+
+example yaml frontmatter
+
+---
+description: {a short description of the rule}
+globs: ["optional/glob/pattern/**", "*.py"]
+alwaysApply: false
+---
+
+## Agent requested rules
+
+The Agent decides if the rule is relevant based on its description. These rules MUST include a description.
+
+An example might be when a user asks about python formatting - the rule will trigger
+
+example yaml frontmatter
+
+---
+description: {a short description of the rule}
+globs: 
+alwaysApply: false
+---
+
+## Manual rules
+
+Manual rules are only included when explicitly mentioned using @ruleName
+
+If asked to create a rule and the agent is unable to make a decision on where to place the rule - it should go in the manual rules folder
+The developer must be alerted when this occurs so that they may take action to manually correct the location.
+
+example yaml frontmatter
+
+---
+description: {a short description of the rule}
+globs: 
+alwaysApply: false
+---
+
+# Cursor Rule File Extension
+
+All files created within the `.cursor/rules/` directory structure, regardless of their category (`always`, `auto-attached`, `agent-requested`), MUST use the `.mdc` file extension. This ensures that the files are correctly recognized and processed by the system.

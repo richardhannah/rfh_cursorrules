@@ -1,0 +1,22 @@
+---
+description: Always identify the repository by running 'git remote -v' when required
+globs: 
+alwaysApply: true
+---
+
+# Identify Repository Rule
+
+Whenever a rule or action requires the agent to understand which repository it is operating in:
+1. Run `git remote -v`.
+2. Use the output to determine the repository name and remote URL.
+
+## Example
+If the output of `git remote -v` is:
+
+```
+origin  git@github.com:richardhannah/rfh_cursorrules.git
+```
+
+Then you know you are running in the `rfh_cursorrules` repository.
+
+

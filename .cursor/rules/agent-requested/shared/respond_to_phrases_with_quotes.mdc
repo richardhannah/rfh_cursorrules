@@ -1,8 +1,9 @@
 ---
-description: 
-globs: 
+description: Respond with a themed quote when the user says a specific phrase in chat
+globs:
 alwaysApply: false
 ---
+
 # Respond to Phrases with Themed Quotes
 
 Whenever the user says one of the following phrases in chat, respond with a random quote from the corresponding theme:
@@ -11,4 +12,5 @@ Whenever the user says one of the following phrases in chat, respond with a rand
 - **'may the force be with you'**: Respond with a random Star Wars quote.
 
 This rule can be extended to support additional phrases and themes as needed.
+
 

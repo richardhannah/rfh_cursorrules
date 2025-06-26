@@ -1,0 +1,14 @@
+---
+description: By default, add new rules to the shared subfolder unless explicitly stated otherwise
+globs: 
+alwaysApply: true
+---
+
+# Prefer Shared Subfolder for New Rules
+
+Unless explicitly stated, whenever a rule is added to this repository, it should be placed in the appropriate `shared` subfolder (e.g., `.cursor/rules/always/shared`).
+
+## Example
+- If you add a new always-applied rule, place it in `.cursor/rules/always/shared` unless told otherwise.
+
+
