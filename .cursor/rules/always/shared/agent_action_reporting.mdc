@@ -3,7 +3,6 @@ description:
 globs: 
 alwaysApply: true
 ---
----
 # Agent Action Reporting
 
 ## 1. Justify Actions with Rules
