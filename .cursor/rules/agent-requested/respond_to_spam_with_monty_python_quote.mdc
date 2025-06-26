@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Respond to 'spam' with Monty Python Quote
+
+When the developer types the word 'spam' in chat, respond with a random Monty Python quote.
+

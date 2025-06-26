@@ -1,0 +1,20 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Agent Rule Creation Behavior
+
+When the user says "add a rule", the agent must:
+
+1.  Create a new rule file within the `.cursor/rules/` directory structure. The content should be a clear, well-formatted markdown document.
+2.  If the appropriate category (`always`, `auto-attached`, `agent-requested`) or file path is not obvious from the context, the agent must ask the user for clarification on where to place the rule.
+3.  The agent should not *only* create a memory when a rule is requested; it must create a persistent rule file. A memory can be created in addition to the rule if the information is also a general preference.
+4.  The agent should ensure that appropriate yaml frontmatter is prepended to the rule depending on the folder it is in.
+
+
+
+# Cursor Rule File Extension
+
+All files created within the `.cursor/rules/` directory structure, regardless of their category (`always`, `auto-attached`, `agent-requested`), MUST use the `.mdc` file extension.
+This ensures that the files are correctly recognized and processed by the system.

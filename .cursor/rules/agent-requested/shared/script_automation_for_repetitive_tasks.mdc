@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Script Automation for Repetitive Tasks
+
+## Principle
+For tasks that are executed often and have a deterministic, predictable outcome, the agent should create a PowerShell script to automate the workflow. This improves reliability, consistency, and efficiency.
+
+## Candidate Identification
+Candidate tasks for scripting include, but are not limited to:
+- Generating reports from structured data (e.g., JSON to Markdown).
+- Complex file or directory manipulation.
+- Multi-step build or deployment processes not already handled by the `Makefile`.
+
+## Implementation Protocol
+1.  **Identify & Propose:** When a suitable task is identified, the agent should propose creating a PowerShell script to the developer.
+2.  **Create Script:** The agent will create a new PowerShell script (`.ps1`) in the `.cursor\scripts` directory. The script should be well-commented and robust.
+3.  **Update Rules:** After the script is created and tested, the agent MUST update any relevant rule files. The rule should be modified to call the new script instead of listing the manual steps.
+
+## Example
+**Old Rule (`some_report_rule.mdc`):**
+> 1. Read `data.json`.
+> 2. Parse the JSON.
+> 3. Format the data into a markdown table.
+> 4. Write the table to `report.md`.
+
+**New Rule (`some_report_rule.mdc`):**
+> Run the `.cursor\scripts\generate-report.ps1` script to generate the report from `data.json`.

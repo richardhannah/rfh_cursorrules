@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+# Agent Action Reporting
+
+## 1. Justify Actions with Rules
+Before taking any action on the repository (such as creating, editing, or deleting files, running scripts, executing `make` targets, or running `git` commands), the agent MUST explicitly state which rule(s) it is following to justify the action.
+
+If no specific rule applies, the agent should state that it is proceeding based on the user's direct instruction.
+
+## 2. Create Action Reports
+After completing a set of related actions, the agent MUST generate a summary report.
+
+### Report Content
+The report must include:
+- A high-level summary of the task or goal.
+- A chronological list of the actions performed.
+- The specific rule(s) that justified each action.
+- The outcome of the actions (e.g., success, failure, test results).
+
+### Report Location and Naming
+- The report MUST be created as a new Markdown file inside the `.cursor/reports` directory at the root of the workspace.
+- If the `.cursor/reports/` directory does not exist, the agent MUST create it.
+- The filename should be a timestamp in the format `YYYY-MM-DD_HH-MM-SS-{shortName}.md`.
+
+## Example Interaction Flow
+
+**User:** "Refactor the database connection logic."
+
+**Agent:** "Okay, I will refactor the database logic. I will be following the 'Clean Architecture' guidelines from our `shared-architecture` rule. First, I will read the existing `DbContext.go` file."
+*(...agent performs actions...)*
+
+**Agent:** "The refactoring is complete. I have generated a summary of the actions taken and the rules followed, which you can find at `action_reports/databaseRefactor_2025-07-21_15-30-00-DatabaseRefactor.md`." 
